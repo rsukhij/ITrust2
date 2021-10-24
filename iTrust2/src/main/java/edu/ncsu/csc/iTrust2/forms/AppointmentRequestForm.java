@@ -37,6 +37,9 @@ public class AppointmentRequestForm {
     /** The comments of the appt request */
     private String comments;
 
+    /** If a vaccination appt is requested, the brand/type of vaccine */
+    private String vaccineType;
+
     /**
      * Don't use this one. For Hibernate/Thymeleaf
      */
