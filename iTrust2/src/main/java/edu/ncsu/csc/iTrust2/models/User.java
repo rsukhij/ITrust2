@@ -42,41 +42,6 @@ import edu.ncsu.csc.iTrust2.models.enums.Role;
 @JsonIgnoreProperties ( value = { "password" } )
 public class User extends DomainObject {
 
-    /**
-     * The username of the user
-     */
-    @Id
-    @Length ( max = 20 )
-    private String    username;
-
-    /**
-     * The password of the user
-     */
-    private String    password;
-
-    /**
-     * Whether or not the user is enabled
-     */
-    @Min ( 0 )
-    @Max ( 1 )
-    private Integer   enabled;
-
-    /**
-     * The role of the user
-     */
-    @ElementCollection ( targetClass = Role.class, fetch = FetchType.EAGER )
-    @Enumerated ( EnumType.STRING )
-    private Set<Role> roles;
-
-    /**
-     * Get the username of this user
-     *
-     * @return the username of this user
-     */
-    public String getUsername () {
-        return username;
-    }
-
     /** For Hibernate */
     protected User () {
     }
@@ -116,6 +81,41 @@ public class User extends DomainObject {
         setEnabled( null != form.getEnabled() ? 1 : 0 );
         setRoles( form.getRoles().stream().map( Role::valueOf ).collect( Collectors.toSet() ) );
 
+    }
+
+    /**
+     * The username of the user
+     */
+    @Id
+    @Length ( max = 20 )
+    private String    username;
+
+    /**
+     * The password of the user
+     */
+    private String    password;
+
+    /**
+     * Whether or not the user is enabled
+     */
+    @Min ( 0 )
+    @Max ( 1 )
+    private Integer   enabled;
+
+    /**
+     * The role of the user
+     */
+    @ElementCollection ( targetClass = Role.class, fetch = FetchType.EAGER )
+    @Enumerated ( EnumType.STRING )
+    private Set<Role> roles;
+
+    /**
+     * Get the username of this user
+     *
+     * @return the username of this user
+     */
+    public String getUsername () {
+        return username;
     }
 
     /**
