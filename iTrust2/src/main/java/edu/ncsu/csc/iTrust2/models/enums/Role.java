@@ -41,7 +41,11 @@ public enum Role {
     /**
      * Virologist
      */
-    ROLE_VIROLOGIST ( 8, "hcp/index" );
+    ROLE_VIROLOGIST ( 8, "hcp/index" ),
+    /**
+     * Vaccinator
+     */
+    ROLE_VACCINATOR ( 9, "vaccinator/index" );
 
     /**
      * Numeric code of the Role
