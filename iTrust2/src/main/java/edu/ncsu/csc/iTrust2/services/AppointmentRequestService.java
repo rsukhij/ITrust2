@@ -6,6 +6,7 @@ import java.util.List;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
@@ -24,20 +25,21 @@ import edu.ncsu.csc.iTrust2.repositories.AppointmentRequestRepository;
  *
  */
 @Component
+@Primary
 @Transactional
-public class AppointmentRequestService extends Service<AppointmentRequest, Long> {
+public class AppointmentRequestService <T extends AppointmentRequest> extends Service<T, Long> {
 
     /** Repository for CRUD tasks */
-    @Autowired
-    private AppointmentRequestRepository repository;
+    private AppointmentRequestRepository<AppointmentRequest> repository;
 
     /** UserService for CRUD operations on User */
     @Autowired
-    private UserService<User>            userService;
+    private UserService<User>                                userService;
 
     @Override
-    protected JpaRepository<AppointmentRequest, Long> getRepository () {
-        return repository;
+    @SuppressWarnings ( "unchecked" )
+    protected JpaRepository<T, Long> getRepository () {
+        return (JpaRepository<T, Long>) repository;
     }
 
     /**
@@ -77,7 +79,7 @@ public class AppointmentRequestService extends Service<AppointmentRequest, Long>
 
     /**
      * Builds an AppointmentRequest from the deserialised form
-     * 
+     *
      * @param raf
      *            AppointmentRequestForm containing data to build an AR from
      * @return Built AppointmentRequest

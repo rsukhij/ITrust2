@@ -49,16 +49,16 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 @AutoConfigureMockMvc
 public class APIAppointmentRequestTest {
 
-    private MockMvc                   mvc;
+    private MockMvc                                       mvc;
 
     @Autowired
-    private WebApplicationContext     context;
+    private WebApplicationContext                         context;
 
     @Autowired
-    private AppointmentRequestService arService;
+    private AppointmentRequestService<AppointmentRequest> arService;
 
     @Autowired
-    private UserService               service;
+    private UserService                                   service;
 
     /**
      * Sets up tests

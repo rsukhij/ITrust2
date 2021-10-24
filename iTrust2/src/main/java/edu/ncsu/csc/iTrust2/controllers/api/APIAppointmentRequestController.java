@@ -41,15 +41,15 @@ public class APIAppointmentRequestController extends APIController {
      * AppointmentRequest service
      */
     @Autowired
-    private AppointmentRequestService service;
+    private AppointmentRequestService<AppointmentRequest> service;
 
     /** LoggerUtil */
     @Autowired
-    private LoggerUtil                loggerUtil;
+    private LoggerUtil                                    loggerUtil;
 
     /** User service */
     @Autowired
-    private UserService<User>         userService;
+    private UserService<User>                             userService;
 
     /**
      * Retrieves a list of all AppointmentRequests in the database
