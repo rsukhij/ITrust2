@@ -75,18 +75,31 @@ public class APIPersonnelTest {
     }
 
     /**
+     * Tests getting a non existent Vaccinator personnel and ensures that the
+     * correct status is returned.
+     *
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    @WithMockUser ( username = "vaccinator", roles = { "VACCINATOR" } )
+    public void testGetNonExistentVaccinatorPersonnel () throws Exception {
+        mvc.perform( get( "/api/v1/personnel/-1" ) ).andExpect( status().isNotFound() );
+    }
+
+    /**
      * Tests PersonnelAPI
      *
      * @throws Exception
      */
     @Test
     @Transactional
-    @WithMockUser ( username = "hcp", roles = { "HCP" } )
+    @WithMockUser ( username = "vaccinator", roles = { "VACCINATOR" } )
     public void testPersonnelAPI () throws Exception {
 
-        final Personnel hcp = new Personnel( new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 ) );
+        final Personnel vaccinator = new Personnel( new UserForm( "vaccinator", "123456", Role.ROLE_VACCINATOR, 1 ) );
 
-        service.save( hcp );
+        service.save( vaccinator );
 
         final PersonnelForm personnel = new PersonnelForm();
 
@@ -102,10 +115,10 @@ public class APIPersonnelTest {
         personnel.setZip( "27514" );
 
         // Should be able to update with the new values
-        mvc.perform( put( "/api/v1/personnel/hcp" ).contentType( MediaType.APPLICATION_JSON )
+        mvc.perform( put( "/api/v1/personnel/vaccinator" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( personnel ) ) ).andExpect( status().isOk() );
 
-        final Personnel retrieved = (Personnel) service.findByName( "hcp" );
+        final Personnel retrieved = (Personnel) service.findByName( "vaccinator" );
 
         Assert.assertEquals( "Prag", retrieved.getCity() );
         Assert.assertEquals( State.NC, retrieved.getState() );
@@ -113,16 +126,16 @@ public class APIPersonnelTest {
         mvc.perform( get( "/api/v1/personnel" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
 
-        mvc.perform( get( "/api/v1/personnel/hcp" ) ).andExpect( status().isOk() )
+        mvc.perform( get( "/api/v1/personnel/vaccinator" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
 
         // Edit with wrong url ID should fail
-        mvc.perform( put( "/api/v1/personnel/badhcp" ).contentType( MediaType.APPLICATION_JSON )
+        mvc.perform( put( "/api/v1/personnel/badvaccinator" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( personnel ) ) ).andExpect( status().isNotFound() );
 
         // Edit with matching, but nonexistent ID should fail.
-        personnel.setUsername( "badhcp" );
-        mvc.perform( put( "/api/v1/personnel/badhcp" ).contentType( MediaType.APPLICATION_JSON )
+        personnel.setUsername( "badvaccinator" );
+        mvc.perform( put( "/api/v1/personnel/badvaccinator" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( personnel ) ) ).andExpect( status().is4xxClientError() );
 
     }

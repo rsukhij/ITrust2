@@ -86,7 +86,7 @@ public class APIPersonnelController extends APIController {
      * @return The personnel object for the currently authenticated user.
      */
     @GetMapping ( BASE_PATH + "/curPersonnel" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', ROLE_VACCINATOR)" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public ResponseEntity getCurrentPersonnel () {
         final String username = LoggerUtil.currentUser();
         final Personnel personnel = (Personnel) service.findByName( username );
@@ -113,7 +113,7 @@ public class APIPersonnelController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/personnel/{id}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', ROLE_VACCINATOR)" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public ResponseEntity updatePersonnel ( @PathVariable final String id,
             @RequestBody final PersonnelForm personnelF ) {
 
@@ -149,7 +149,7 @@ public class APIPersonnelController extends APIController {
      * @return response and list of personnel matching query
      */
     @GetMapping ( BASE_PATH + "/personnel/getbyroles/{role}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT', ROLE_VACCINATOR)" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT', 'ROLE_VACCINATOR')" )
     public ResponseEntity getPersonnelByRole ( @PathVariable ( "role" ) final String role ) {
         final List<Personnel> allPersonnel = service.findAll();
 
@@ -175,7 +175,7 @@ public class APIPersonnelController extends APIController {
      * @return response and list of personnel with statistics matching query
      */
     @GetMapping ( BASE_PATH + "/personnel/getbyroles/{role}/statistics" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT', ROLE_VACCINATOR)" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT', 'ROLE_VACCINATOR')" )
     public ResponseEntity getPersonnelByRoleWithStatistics ( @PathVariable ( "role" ) final String role ) {
         final List<Personnel> allPersonnel = service.findAll();
 
