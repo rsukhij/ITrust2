@@ -8,7 +8,6 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters.LocalDateConverter;
 
@@ -81,7 +80,6 @@ public class Patient extends User {
     @Enumerated ( EnumType.STRING )
     private State                    state;
 
-    @ColumnDefault ( "NO_VACCINATION" )
     @Enumerated ( EnumType.STRING )
     private PatientVaccinationStatus vaccinationStatus;
 

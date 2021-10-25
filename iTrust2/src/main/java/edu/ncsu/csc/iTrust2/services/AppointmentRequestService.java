@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import edu.ncsu.csc.iTrust2.forms.AppointmentRequestForm;
 import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.User;
+import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.repositories.AppointmentRequestRepository;
@@ -30,6 +31,7 @@ import edu.ncsu.csc.iTrust2.repositories.AppointmentRequestRepository;
 public class AppointmentRequestService <T extends AppointmentRequest> extends Service<T, Long> {
 
     /** Repository for CRUD tasks */
+    @Autowired
     private AppointmentRequestRepository<AppointmentRequest> repository;
 
     /** UserService for CRUD operations on User */
@@ -85,8 +87,12 @@ public class AppointmentRequestService <T extends AppointmentRequest> extends Se
      * @return Built AppointmentRequest
      */
     public AppointmentRequest build ( final AppointmentRequestForm raf ) {
-        final AppointmentRequest ar = new AppointmentRequest();
-
+        AppointmentRequest ar = new AppointmentRequest();
+        if ( raf.getType() == AppointmentType.VACCINATION.toString() ) {
+            final VaccinationAppointmentRequest temp = new VaccinationAppointmentRequest();
+            temp.setVaccineType( raf.getVaccineType() );
+            ar = temp;
+        }
         ar.setPatient( userService.findByName( raf.getPatient() ) );
         ar.setHcp( userService.findByName( raf.getHcp() ) );
         ar.setComments( raf.getComments() );

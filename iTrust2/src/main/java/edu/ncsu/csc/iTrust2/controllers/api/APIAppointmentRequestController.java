@@ -18,11 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.ncsu.csc.iTrust2.forms.AppointmentRequestForm;
 import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.User;
+import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
+import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.models.enums.TransactionType;
 import edu.ncsu.csc.iTrust2.services.AppointmentRequestService;
 import edu.ncsu.csc.iTrust2.services.UserService;
+import edu.ncsu.csc.iTrust2.services.VaccinationAppointmentRequestService;
 import edu.ncsu.csc.iTrust2.utils.LoggerUtil;
 
 /**
@@ -41,15 +44,18 @@ public class APIAppointmentRequestController extends APIController {
      * AppointmentRequest service
      */
     @Autowired
-    private AppointmentRequestService<AppointmentRequest> service;
+    private AppointmentRequestService<AppointmentRequest>                       service;
+
+    @Autowired
+    private VaccinationAppointmentRequestService<VaccinationAppointmentRequest> vaccReqService;
 
     /** LoggerUtil */
     @Autowired
-    private LoggerUtil                                    loggerUtil;
+    private LoggerUtil                                                          loggerUtil;
 
     /** User service */
     @Autowired
-    private UserService<User>                             userService;
+    private UserService<User>                                                   userService;
 
     /**
      * Retrieves a list of all AppointmentRequests in the database
@@ -62,6 +68,22 @@ public class APIAppointmentRequestController extends APIController {
         final List<AppointmentRequest> requests = service.findAll();
 
         requests.stream().map( AppointmentRequest::getPatient ).distinct().forEach( e -> loggerUtil
+                .log( TransactionType.APPOINTMENT_REQUEST_VIEWED, LoggerUtil.currentUser(), e.getUsername() ) );
+
+        return requests;
+    }
+
+    /**
+     * Retrieves a list of all AppointmentRequests in the database
+     *
+     * @return list of appointment requests
+     */
+    @GetMapping ( BASE_PATH + "/vaccappointmentrequests" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP','ROLE_VACCINATOR')" )
+    public List<VaccinationAppointmentRequest> getVaccAppointmentRequests () {
+        final List<VaccinationAppointmentRequest> requests = vaccReqService.findAll();
+
+        requests.stream().map( VaccinationAppointmentRequest::getPatient ).distinct().forEach( e -> loggerUtil
                 .log( TransactionType.APPOINTMENT_REQUEST_VIEWED, LoggerUtil.currentUser(), e.getUsername() ) );
 
         return requests;
@@ -140,13 +162,19 @@ public class APIAppointmentRequestController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity createAppointmentRequest ( @RequestBody final AppointmentRequestForm requestForm ) {
         try {
+
             final AppointmentRequest request = service.build( requestForm );
             if ( null != service.findById( request.getId() ) ) {
                 return new ResponseEntity(
                         errorResponse( "AppointmentRequest with the id " + request.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
-            service.save( request );
+            if ( requestForm.getType() == AppointmentType.VACCINATION.toString() ) {
+                vaccReqService.save( (VaccinationAppointmentRequest) request );
+            }
+            else {
+                service.save( request );
+            }
             loggerUtil.log( TransactionType.APPOINTMENT_REQUEST_SUBMITTED, request.getPatient(), request.getHcp() );
             return new ResponseEntity( request, HttpStatus.OK );
         }
