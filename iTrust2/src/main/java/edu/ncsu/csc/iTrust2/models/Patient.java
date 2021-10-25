@@ -36,49 +36,57 @@ public class Patient extends User {
      * The first name of this patient
      */
     @Length ( min = 1 )
-    private String                   firstName;
+    private String firstName;
 
     /**
      * The preferred name of this patient
      */
     @Length ( max = 20 )
-    private String                   preferredName;
+    private String preferredName;
 
     /**
      * The last name of this patient
      */
     @Length ( min = 1 )
-    private String                   lastName;
+    private String lastName;
 
     /**
      * The email address of this patient
      */
     @Length ( max = 30 )
-    private String                   email;
+    private String email;
 
     /**
      * The address line 1 of this patient
      */
     @Length ( max = 50 )
-    private String                   address1;
+    private String address1;
 
     /**
      * The address line 2 of this patient
      */
     @Length ( max = 50 )
-    private String                   address2;
+    private String address2;
 
     /**
      * The city of residence of this patient
      */
     @Length ( max = 15 )
-    private String                   city;
+    private String city;
 
     /**
      * The state of residence of this patient
      */
     @Enumerated ( EnumType.STRING )
-    private State                    state;
+    private State  state;
+
+    public PatientVaccinationStatus getVaccinationStatus () {
+        return vaccinationStatus;
+    }
+
+    public void setVaccinationStatus ( final PatientVaccinationStatus vaccinationStatus ) {
+        this.vaccinationStatus = vaccinationStatus;
+    }
 
     @Enumerated ( EnumType.STRING )
     private PatientVaccinationStatus vaccinationStatus;
