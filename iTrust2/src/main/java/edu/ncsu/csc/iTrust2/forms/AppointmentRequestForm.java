@@ -37,6 +37,9 @@ public class AppointmentRequestForm {
     /** The comments of the appt request */
     private String comments;
 
+    /** The vaccine type */
+    private String vaccineType;
+
     /**
      * Don't use this one. For Hibernate/Thymeleaf
      */
@@ -61,6 +64,25 @@ public class AppointmentRequestForm {
         }
 
         setStatus( request.getStatus().toString() );
+    }
+
+    /**
+     * Get the vaccine type
+     *
+     * @return the vaccine type
+     */
+    public String getVaccineType () {
+        return vaccineType;
+    }
+
+    /**
+     * Set the vaccine tpye
+     *
+     * @param vaccineType
+     *            the vaccine type
+     */
+    public void setVaccineType ( final String vaccineType ) {
+        this.vaccineType = vaccineType;
     }
 
     /**

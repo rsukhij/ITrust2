@@ -32,11 +32,13 @@ import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.Personnel;
 import edu.ncsu.csc.iTrust2.models.User;
+import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.services.AppointmentRequestService;
 import edu.ncsu.csc.iTrust2.services.UserService;
+import edu.ncsu.csc.iTrust2.services.VaccinationAppointmentRequestService;
 
 /**
  * Test for the API functionality for interacting with appointment requests
@@ -49,16 +51,19 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 @AutoConfigureMockMvc
 public class APIAppointmentRequestTest {
 
-    private MockMvc                   mvc;
+    private MockMvc                                                             mvc;
 
     @Autowired
-    private WebApplicationContext     context;
+    private WebApplicationContext                                               context;
 
     @Autowired
-    private AppointmentRequestService arService;
+    private AppointmentRequestService<AppointmentRequest>                       arService;
 
     @Autowired
-    private UserService               service;
+    private VaccinationAppointmentRequestService<VaccinationAppointmentRequest> vaccReqService;
+
+    @Autowired
+    private UserService                                                         service;
 
     /**
      * Sets up tests
@@ -181,6 +186,57 @@ public class APIAppointmentRequestTest {
                 .content( TestUtils.asJsonString( appointmentForm ) ) ).andExpect( status().isNotFound() );
 
         mvc.perform( delete( "/api/v1/appointmentrequests/" + id ) ).andExpect( status().isOk() );
+
+    }
+
+    /**
+     * Tests VaccinationAppointmentRequestAPi
+     *
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser ( username = "patient", roles = { "PATIENT" } )
+    @Transactional
+    public void testVaccinationAppointmentRequestAPI () throws Exception {
+
+        final AppointmentRequestForm appointmentForm = new AppointmentRequestForm();
+        appointmentForm.setDate( "2030-11-20T04:50:00.000-05:00" ); // 2030-11-19
+                                                                    // 4:50 AM
+                                                                    // EST
+        appointmentForm.setType( AppointmentType.VACCINATION.toString() );
+        appointmentForm.setStatus( Status.PENDING.toString() );
+        appointmentForm.setHcp( "hcp" );
+        appointmentForm.setPatient( "patient" );
+        appointmentForm.setComments( "Test appointment please ignore" );
+        appointmentForm.setVaccineType( "Pfizer" );
+
+        /* Create the request */
+        mvc.perform( post( "/api/v1/appointmentrequests" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( appointmentForm ) ) );
+
+        mvc.perform( get( "/api/v1/appointmentrequest" ) ).andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
+
+        final List<AppointmentRequest> forPatient = arService.findAll();
+        Assert.assertEquals( 1, forPatient.size() );
+
+    }
+
+    /**
+     * Tests getting VaccinationAppointmentRequests for HCP or Vaccinator to see
+     *
+     * @throws Exception
+     */
+    @Test
+    @WithMockUser ( username = "hcp", roles = { "HCP" } )
+    @Transactional
+    public void testVaccinationAppointmentRequestsHCPAPI () throws Exception {
+
+        mvc.perform( get( "/api/v1/vaccappointmentrequests" ) ).andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
+
+        final List<VaccinationAppointmentRequest> forHCP = vaccReqService.findAll();
+        Assert.assertEquals( 0, forHCP.size() );
 
     }
 
