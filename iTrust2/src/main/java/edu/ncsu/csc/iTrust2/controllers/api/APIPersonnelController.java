@@ -27,6 +27,7 @@ import edu.ncsu.csc.iTrust2.utils.LoggerUtil;
  * Personnel model.
  *
  * @author Kai Presler-Marshall
+ * @author Rohan Rehman
  *
  */
 @RestController
@@ -51,7 +52,7 @@ public class APIPersonnelController extends APIController {
      * @return list of personnel
      */
     @GetMapping ( BASE_PATH + "/personnel" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public List<Personnel> getPersonnel () {
         return service.findAll();
     }
@@ -65,7 +66,7 @@ public class APIPersonnelController extends APIController {
      * @return response
      */
     @GetMapping ( BASE_PATH + "/personnel/{id}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public ResponseEntity getPersonnel ( @PathVariable ( "id" ) final String id ) {
         final Personnel personnel = (Personnel) service.findByName( id );
         if ( null == personnel ) {
@@ -85,7 +86,7 @@ public class APIPersonnelController extends APIController {
      * @return The personnel object for the currently authenticated user.
      */
     @GetMapping ( BASE_PATH + "/curPersonnel" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public ResponseEntity getCurrentPersonnel () {
         final String username = LoggerUtil.currentUser();
         final Personnel personnel = (Personnel) service.findByName( username );
@@ -112,7 +113,7 @@ public class APIPersonnelController extends APIController {
      * @return response
      */
     @PutMapping ( BASE_PATH + "/personnel/{id}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public ResponseEntity updatePersonnel ( @PathVariable final String id,
             @RequestBody final PersonnelForm personnelF ) {
 
@@ -148,7 +149,7 @@ public class APIPersonnelController extends APIController {
      * @return response and list of personnel matching query
      */
     @GetMapping ( BASE_PATH + "/personnel/getbyroles/{role}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT', 'ROLE_VACCINATOR')" )
     public ResponseEntity getPersonnelByRole ( @PathVariable ( "role" ) final String role ) {
         final List<Personnel> allPersonnel = service.findAll();
 
@@ -174,7 +175,7 @@ public class APIPersonnelController extends APIController {
      * @return response and list of personnel with statistics matching query
      */
     @GetMapping ( BASE_PATH + "/personnel/getbyroles/{role}/statistics" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_PATIENT', 'ROLE_VACCINATOR')" )
     public ResponseEntity getPersonnelByRoleWithStatistics ( @PathVariable ( "role" ) final String role ) {
         final List<Personnel> allPersonnel = service.findAll();
 
