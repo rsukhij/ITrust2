@@ -95,7 +95,7 @@ public class APIPersonnelTest {
     @Test
     @Transactional
     @WithMockUser ( username = "vaccinator", roles = { "VACCINATOR" } )
-    public void testPersonnelAPI () throws Exception {
+    public void testVaccinatorPersonnelAPI () throws Exception {
 
         final Personnel vaccinator = new Personnel( new UserForm( "vaccinator", "123456", Role.ROLE_VACCINATOR, 1 ) );
 
@@ -141,6 +141,59 @@ public class APIPersonnelTest {
     }
 
     /**
+     * Tests PersonnelAPI
+     *
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    @WithMockUser ( username = "hcp", roles = { "HCP" } )
+    public void testHCPPersonnelAPI () throws Exception {
+
+        final Personnel vaccinator = new Personnel( new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 ) );
+
+        service.save( vaccinator );
+
+        final PersonnelForm personnel = new PersonnelForm();
+
+        personnel.setAddress1( "1 Test Street" );
+        personnel.setAddress2( "Address Part 2" );
+        personnel.setCity( "Prag" );
+        personnel.setEmail( "hcp@itrust.cz" );
+        personnel.setFirstName( "Test" );
+        personnel.setLastName( "HCP" );
+        personnel.setPhone( "123-456-7890" );
+        personnel.setUsername( "hcp" );
+        personnel.setState( State.NC.toString() );
+        personnel.setZip( "27514" );
+
+        // Should be able to update with the new values
+        mvc.perform( put( "/api/v1/personnel/hcp" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( personnel ) ) ).andExpect( status().isOk() );
+
+        final Personnel retrieved = (Personnel) service.findByName( "hcp" );
+
+        Assert.assertEquals( "Prag", retrieved.getCity() );
+        Assert.assertEquals( State.NC, retrieved.getState() );
+
+        mvc.perform( get( "/api/v1/personnel" ) ).andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
+
+        mvc.perform( get( "/api/v1/personnel/hcp" ) ).andExpect( status().isOk() )
+                .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
+
+        // Edit with wrong url ID should fail
+        mvc.perform( put( "/api/v1/personnel/badhcp" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( personnel ) ) ).andExpect( status().isNotFound() );
+
+        // Edit with matching, but nonexistent ID should fail.
+        personnel.setUsername( "badhcp" );
+        mvc.perform( put( "/api/v1/personnel/badhcp" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( personnel ) ) ).andExpect( status().is4xxClientError() );
+
+    }
+
+    /**
      * Tests getting personnel by their roles.
      *
      * @throws Exception
@@ -156,6 +209,21 @@ public class APIPersonnelTest {
         mvc.perform( get( "/api/v1/personnel/getbyroles/ROLE_OD" ) ).andExpect( status().isOk() );
         mvc.perform( get( "/api/v1/personnel/getbyroles/ROLE_OPH" ) ).andExpect( status().isOk() );
 
+        // Invalid get request
+        mvc.perform( get( "/api/v1/personnel/getbyroles/ROLE_SCHMOO" ) ).andExpect( status().is4xxClientError() );
+    }
+
+    /**
+     * Tests getting personnel by their roles.
+     *
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    @WithMockUser ( username = "vaccinator", roles = { "ADMIN" } )
+    public void testGetByRoleVaccinator () throws Exception {
+        // Valid get requests
+        mvc.perform( get( "/api/v1/personnel/getbyroles/ROLE_VACCINATOR" ) ).andExpect( status().isOk() );
         // Invalid get request
         mvc.perform( get( "/api/v1/personnel/getbyroles/ROLE_SCHMOO" ) ).andExpect( status().is4xxClientError() );
     }
@@ -182,7 +250,5 @@ public class APIPersonnelTest {
         Assert.assertTrue( content.contains( "hcp_test1" ) );
         Assert.assertTrue( content.contains( "hcp_test2" ) );
         Assert.assertFalse( content.contains( "admin_test" ) );
-
     }
-
 }
