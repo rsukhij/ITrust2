@@ -2,7 +2,7 @@ package edu.ncsu.csc.iTrust2.repositories;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import edu.ncsu.csc.iTrust2.vaccine.Vaccine;
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 
 /**
  * VaccineRepository provides CRUD operations for the Vaccine model. Spring will
