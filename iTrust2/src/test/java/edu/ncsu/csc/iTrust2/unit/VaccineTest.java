@@ -21,6 +21,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import edu.ncsu.csc.iTrust2.TestConfig;
 import edu.ncsu.csc.iTrust2.models.Vaccine;
 
+import edu.ncsu.csc.iTrust2.models.Vaccine;
+
 /**
  * @author sarasophiamasood
  *
