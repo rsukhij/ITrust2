@@ -12,10 +12,10 @@ public class Vaccine extends DomainObject {
     int                   ageMin;
     int                   ageMax;
     // String ageRange;
-    int                   doseNumber;
+    static int            doseNumber;
     boolean               ifSecondDose;
     int                   daysBetween;
-    boolean               ifAvailable;
+    static boolean        ifAvailable;
 
     private List<Vaccine> vaccineList;
 
@@ -54,7 +54,7 @@ public class Vaccine extends DomainObject {
         this.ageMax = ageMax;
     }
 
-    public int getDoseNumber () {
+    public static int getDoseNumber () {
         return doseNumber;
     }
 
@@ -78,7 +78,7 @@ public class Vaccine extends DomainObject {
         this.daysBetween = daysBetween;
     }
 
-    public boolean getIfAvailable () {
+    public static boolean getIfAvailable () {
         return ifAvailable;
     }
 
