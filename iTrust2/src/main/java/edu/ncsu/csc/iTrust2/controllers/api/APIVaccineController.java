@@ -5,10 +5,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,15 +28,17 @@ public class APIVaccineController extends APIController {
         return service.findAll();
     }
 
-    @SuppressWarnings ( { "rawtypes", "unchecked" } )
-    @GetMapping ( BASE_PATH + "/addVaccine/{name}" )
-    public ResponseEntity getVaccine ( @PathVariable ( "name" ) final String name ) {
-        final Vaccine vaccine = service.findByVaccineName( name );
-        return null == vaccine
-                ? new ResponseEntity( errorResponse( "No vaccine found with name " + name ), HttpStatus.NOT_FOUND )
-                : new ResponseEntity( vaccine, HttpStatus.OK );
+    /**
+     * Gets a list of vaccines in the system
+     *
+     * @return list of vaccines
+     */
+    @GetMapping ( BASE_PATH + "/addVaccine/vaccines" )
+    public List<Vaccine> getVaccine () {
+        return service.findAll();
     }
 
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @PostMapping ( BASE_PATH + "/addVaccine" )
     public ResponseEntity addVaccine ( @RequestBody final Vaccine vaccine ) {
@@ -54,8 +58,9 @@ public class APIVaccineController extends APIController {
         }
     }
 
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
-    @PostMapping ( BASE_PATH + "/addVaccine/{name}" )
+    @PutMapping ( BASE_PATH + "/addVaccine/{name}" )
     public ResponseEntity editVaccine ( @PathVariable ( "name" ) final Vaccine v ) {
         final Vaccine vaccine = service.findByVaccineName( "v" );
         if ( vaccine == null ) {
@@ -65,6 +70,7 @@ public class APIVaccineController extends APIController {
         return new ResponseEntity( vaccine, HttpStatus.OK );
     }
 
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @DeleteMapping ( BASE_PATH + "/addVaccine/{name}" )
     public ResponseEntity deleteVaccine ( @PathVariable final String name ) {
