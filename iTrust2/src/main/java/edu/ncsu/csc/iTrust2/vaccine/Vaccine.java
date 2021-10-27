@@ -1,7 +1,6 @@
 package edu.ncsu.csc.iTrust2.vaccine;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -9,15 +8,16 @@ import edu.ncsu.csc.iTrust2.models.DomainObject;
 
 public class Vaccine extends DomainObject {
 
-    String                      name;
-    int                         ageMin;
-    int                         ageMax;
-    int                         doseNumber;
-    boolean                     ifSecondDose;
-    int                         daysBetween;
-    boolean                     ifAvailable;
+    String                name;
+    int                   ageMin;
+    int                   ageMax;
+    // String ageRange;
+    int                   doseNumber;
+    boolean               ifSecondDose;
+    int                   daysBetween;
+    boolean               ifAvailable;
 
-    private final List<Vaccine> vaccineList;
+    private List<Vaccine> vaccineList;
 
     public Vaccine () {
         setName( name );
@@ -27,7 +27,7 @@ public class Vaccine extends DomainObject {
         setIfSecondDose( ifSecondDose );
         setDaysBetween( daysBetween );
         setIfAvailable( ifAvailable );
-        vaccineList = new ArrayList<Vaccine>();
+        // vaccineList = new ArrayList<Vaccine>();
     }
 
     public String getName () {
@@ -59,13 +59,10 @@ public class Vaccine extends DomainObject {
     }
 
     public void setDoseNumber ( final int doseNumber ) {
-        if ( ( doseNumber != 1 ) || ( doseNumber != 2 ) ) {
-            throw new IllegalArgumentException();
-        }
         this.doseNumber = doseNumber;
     }
 
-    public boolean isIfSecondDose () {
+    public boolean getIfSecondDose () {
         return ifSecondDose;
     }
 
@@ -81,7 +78,7 @@ public class Vaccine extends DomainObject {
         this.daysBetween = daysBetween;
     }
 
-    public boolean isIfAvailable () {
+    public boolean getIfAvailable () {
         return ifAvailable;
     }
 
@@ -94,7 +91,7 @@ public class Vaccine extends DomainObject {
         final Vaccine vaccine = new Vaccine();
         for ( int i = 0; i < vaccineList.size(); i++ ) {
             if ( name.equals( ( i ) ) ) {
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException( "Duplicate Vaccines are not allowed." );
             }
         }
         vaccine.setName( name );
@@ -115,25 +112,18 @@ public class Vaccine extends DomainObject {
     public void editVaccine ( final String name, final int ageMin, final int ageMax, final int doseNumber,
             final boolean ifSecondDose, final int daysBetween, final boolean ifAvailable ) {
 
-        for ( int i = 0; i < vaccineList.size(); i++ ) {
-            if ( vaccineList.get( i ).getName().equals( ( name ) ) ) {
-                vaccineList.get( i ).setAgeMin( ageMin );
-                vaccineList.get( i ).setAgeMax( ageMax );
-                vaccineList.get( i ).setDoseNumber( doseNumber );
-                vaccineList.get( i ).setIfSecondDose( ifSecondDose );
-                vaccineList.get( i ).setDaysBetween( daysBetween );
-                vaccineList.get( i ).setIfAvailable( ifAvailable );
+        final Vaccine vaccine = new Vaccine();
+        vaccine.setName( name );
+        vaccine.setAgeMin( ageMin );
+        vaccine.setAgeMax( ageMax );
+        vaccine.setDoseNumber( doseNumber );
+        vaccine.setIfSecondDose( ifSecondDose );
+        vaccine.setDaysBetween( daysBetween );
+        vaccine.setIfAvailable( ifAvailable );
 
-            }
-        }
+        vaccineList.add( vaccine );
 
     }
-
-    // public void saveVaccine ( final int name ) {
-    //
-    //
-    //
-    // }
 
     public void updateVaccine ( final String vaccine, final boolean ifAvailable ) {
         for ( int i = 0; i < vaccineList.size(); i++ ) {
