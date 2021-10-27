@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
-import edu.ncsu.csc.iTrust2.models.Vaccine;
+import edu.ncsu.csc.iTrust2.vaccine.Vaccine;
 import edu.ncsu.csc.iTrust2.repositories.VaccineRepository;
 
 /**
@@ -26,11 +26,9 @@ public class VaccineService extends Service<Vaccine, Long> {
 	    }
 
 	    
-	    public Vaccine findByName ( final String name ) {
-	        if (vaccineRepository.findByName( name ).isPresent())
-	            return vaccineRepository.findByName( name ).get();
-	        else
-	            return null;
+	    public Vaccine findByVaccineName ( final String name ) {
+	        return vaccineRepository.findByName( name );
+	            
 	    }
 
 }
