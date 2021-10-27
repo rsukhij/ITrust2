@@ -1,24 +1,28 @@
 package edu.ncsu.csc.iTrust2.models;
 
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.LocalDate;
 import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
+import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
+
 @Entity
 public class Vaccine extends DomainObject {
 
     @Id
-    String         name;
+    String  name;
 
-    int            ageMin;
-    int            ageMax;
+    int     ageMin;
+    int     ageMax;
     // String ageRange;
-    static int     doseNumber;
-    boolean        ifSecondDose;
-    int            daysBetween;
-    static boolean ifAvailable;
+    int     doseNumber;
+    boolean ifSecondDose;
+    int     daysBetween;
+    boolean ifAvailable;
 
     public Vaccine () {
         setName( name );
@@ -55,7 +59,7 @@ public class Vaccine extends DomainObject {
         this.ageMax = ageMax;
     }
 
-    public static int getDoseNumber () {
+    public int getDoseNumber () {
         return doseNumber;
     }
 
@@ -79,7 +83,7 @@ public class Vaccine extends DomainObject {
         this.daysBetween = daysBetween;
     }
 
-    public static boolean getIfAvailable () {
+    public boolean getIfAvailable () {
         return ifAvailable;
     }
 
@@ -121,6 +125,18 @@ public class Vaccine extends DomainObject {
         return ageMax == other.ageMax && ageMin == other.ageMin && daysBetween == other.daysBetween
                 && doseNumber == other.doseNumber && ifAvailable == other.ifAvailable
                 && ifSecondDose == other.ifSecondDose && Objects.equals( name, other.name );
+    }
+
+    public boolean isEligible ( final Patient patient ) {
+        final long daysAfterBirth = Duration.between( patient.getDateOfBirth(), LocalDate.now() ).toDays();
+        final int approxAge = (int) ( daysAfterBirth / 365.2425 );
+        if ( approxAge < ageMin || approxAge > ageMax ) {
+            return false;
+        }
+        if ( patient.getVaccinationStatus() == PatientVaccinationStatus.FULLY_VACCINATED ) {
+            return false;
+        }
+        return true;
     }
 
     @Override

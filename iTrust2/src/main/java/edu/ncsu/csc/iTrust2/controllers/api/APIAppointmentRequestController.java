@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import edu.ncsu.csc.iTrust2.forms.AppointmentRequestForm;
 import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
+import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
@@ -24,8 +25,10 @@ import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.models.enums.TransactionType;
 import edu.ncsu.csc.iTrust2.services.AppointmentRequestService;
+import edu.ncsu.csc.iTrust2.services.PatientService;
 import edu.ncsu.csc.iTrust2.services.UserService;
 import edu.ncsu.csc.iTrust2.services.VaccinationAppointmentRequestService;
+import edu.ncsu.csc.iTrust2.services.VaccineService;
 import edu.ncsu.csc.iTrust2.utils.LoggerUtil;
 
 /**
@@ -53,9 +56,17 @@ public class APIAppointmentRequestController extends APIController {
     @Autowired
     private LoggerUtil                                                          loggerUtil;
 
+    /** VaccineService */
+    @Autowired
+    private VaccineService                                                      vaccService;
+
     /** User service */
     @Autowired
     private UserService<User>                                                   userService;
+
+    /** Patient service */
+    @Autowired
+    private PatientService                                                      patientService;
 
     /**
      * Retrieves a list of all AppointmentRequests in the database
@@ -162,8 +173,22 @@ public class APIAppointmentRequestController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity createAppointmentRequest ( @RequestBody final AppointmentRequestForm requestForm ) {
         try {
+            if ( requestForm.getType() == AppointmentType.VACCINATION.toString() && requestForm.getVaccineType() != null
+                    && vaccService.findByVaccineName( requestForm.getVaccineType() ) != null ) {
+                final Patient patient = (Patient) patientService.findByName( LoggerUtil.currentUser() );
+                final boolean eligible = vaccService.findByVaccineName( requestForm.getVaccineType() )
+                        .isEligible( patient );
+                if ( !eligible ) {
+                    return new ResponseEntity( errorResponse( "Patient is not eligible for vaccine" ),
+                            HttpStatus.BAD_REQUEST );
+                }
+            }
 
+            if ( requestForm.getType() == AppointmentType.VACCINATION.toString() ) {
+
+            }
             final AppointmentRequest request = service.build( requestForm );
+
             if ( null != service.findById( request.getId() ) ) {
                 return new ResponseEntity(
                         errorResponse( "AppointmentRequest with the id " + request.getId() + " already exists" ),

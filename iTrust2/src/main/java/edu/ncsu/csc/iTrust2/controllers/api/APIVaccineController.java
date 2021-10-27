@@ -38,7 +38,7 @@ public class APIVaccineController extends APIController {
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @PostMapping ( BASE_PATH + "/addVaccine" )
     public ResponseEntity addVaccine ( @RequestBody final Vaccine vaccine ) {
-        if ( Vaccine.getIfAvailable() == false ) {
+        if ( vaccine.getIfAvailable() == false ) {
             return new ResponseEntity(
                     errorResponse( "Vaccine with the name " + vaccine.getName() + " is not available" ),
                     HttpStatus.CONFLICT );
