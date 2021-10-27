@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.services.VaccineService;
-import edu.ncsu.csc.iTrust2.vaccine.Vaccine;
 
 @RestController
 public class APIVaccineController extends APIController {
@@ -56,21 +56,11 @@ public class APIVaccineController extends APIController {
 
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @PostMapping ( BASE_PATH + "/addVaccine/{name}" )
-    public ResponseEntity editVaccine ( @PathVariable ( "name" ) final String name, @RequestBody final Integer minAge,
-            @RequestBody final Integer maxAge, @RequestBody final Integer doseNumber,
-            @RequestBody final Boolean ifSecondDose, @RequestBody final Integer timeBetween,
-            @RequestBody final Boolean ifAvailable ) {
-        final Vaccine vaccine = service.findByVaccineName( name );
+    public ResponseEntity editVaccine ( @PathVariable ( "name" ) final Vaccine v ) {
+        final Vaccine vaccine = service.findByVaccineName( "v" );
         if ( vaccine == null ) {
-            return new ResponseEntity( errorResponse( "No vaccine found with name" + name ), HttpStatus.NOT_FOUND );
+            return new ResponseEntity( errorResponse( "No vaccine found with name" + v ), HttpStatus.NOT_FOUND );
         }
-        vaccine.setName( "Pfizer" );
-        vaccine.setAgeMax( 100 );
-        vaccine.setAgeMin( 18 );
-        vaccine.setDoseNumber( 1 );
-        vaccine.setIfSecondDose( false );
-        vaccine.setDaysBetween( 0 );
-        vaccine.setIfAvailable( true );
         service.save( vaccine );
         return new ResponseEntity( vaccine, HttpStatus.OK );
     }

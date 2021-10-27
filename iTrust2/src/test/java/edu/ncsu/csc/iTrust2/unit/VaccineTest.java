@@ -1,7 +1,7 @@
 /**
  *
  */
-package edu.ncsu.csc.iTrust2.vaccine;
+package edu.ncsu.csc.iTrust2.unit;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -10,20 +10,33 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+import edu.ncsu.csc.iTrust2.TestConfig;
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 
 /**
  * @author sarasophiamasood
  *
  */
+@RunWith ( SpringRunner.class )
+@EnableAutoConfiguration
+@SpringBootTest ( classes = TestConfig.class )
 class VaccineTest {
 
     private final List<Vaccine> vaccineList = new ArrayList<Vaccine>();
 
     /**
-     * Test method for {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#hashCode()}.
+     * Test method for {@link edu.ncsu.csc.iTrust2.models.Vaccine#hashCode()}.
      */
     @Test
+    @Transactional
     void testHashCode () {
         final Vaccine v = new Vaccine();
         v.setName( "Pfizer" );
@@ -75,9 +88,10 @@ class VaccineTest {
     }
 
     /**
-     * Test method for {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#Vaccine()}.
+     * Test method for {@link edu.ncsu.csc.iTrust2.models.Vaccine#Vaccine()}.
      */
     @Test
+    @Transactional
     void testVaccine () {
         final Vaccine v = new Vaccine();
         v.setName( "Pfizer" );
@@ -100,9 +114,10 @@ class VaccineTest {
 
     /**
      * Test method for
-     * {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#addVaccine(java.lang.String, int, int, int, boolean, int, boolean)}.
+     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#addVaccine(java.lang.String, int, int, int, boolean, int, boolean)}.
      */
     @Test
+    @Transactional
     void testAddVaccine () {
         final Vaccine v2 = new Vaccine();
         v2.setName( "Moderna" );
@@ -144,9 +159,10 @@ class VaccineTest {
 
     /**
      * Test method for
-     * {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#editVaccine(java.lang.String, int, int, int, boolean, int, boolean)}.
+     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#editVaccine(java.lang.String, int, int, int, boolean, int, boolean)}.
      */
     @Test
+    @Transactional
     void testEditVaccine () {
         // final Vaccine v = new Vaccine();
         // v.setName( "Pfizer" );
@@ -164,9 +180,10 @@ class VaccineTest {
 
     /**
      * Test method for
-     * {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#updateVaccine(java.lang.String, boolean)}.
+     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#updateVaccine(java.lang.String, boolean)}.
      */
     @Test
+    @Transactional
     void testUpdateVaccine () {
         // final Vaccine v = new Vaccine();
         // v.setName( "Pfizer" );
@@ -200,9 +217,10 @@ class VaccineTest {
 
     /**
      * Test method for
-     * {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#listVaccinesAvailable()}.
+     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#listVaccinesAvailable()}.
      */
     @Test
+    @Transactional
     void testListVaccinesAvailable () {
         final Vaccine v = new Vaccine();
         v.setName( "Pfizer" );
@@ -242,9 +260,10 @@ class VaccineTest {
 
     /**
      * Test method for
-     * {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#equals(java.lang.Object)}.
+     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#equals(java.lang.Object)}.
      */
     @Test
+    @Transactional
     void testEqualsObject () {
         final Vaccine v = new Vaccine();
         v.setName( "Pfizer" );
@@ -288,9 +307,10 @@ class VaccineTest {
     }
 
     /**
-     * Test method for {@link edu.ncsu.csc.iTrust2.vaccine.Vaccine#toString()}.
+     * Test method for {@link edu.ncsu.csc.iTrust2.models.Vaccine#toString()}.
      */
     @Test
+    @Transactional
     void testToString () {
         final Vaccine v = new Vaccine();
         v.setName( "Pfizer" );

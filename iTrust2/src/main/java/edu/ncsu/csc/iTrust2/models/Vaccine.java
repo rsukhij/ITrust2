@@ -1,11 +1,12 @@
-package edu.ncsu.csc.iTrust2.vaccine;
+package edu.ncsu.csc.iTrust2.models;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-import edu.ncsu.csc.iTrust2.models.DomainObject;
+import javax.persistence.Entity;
 
+@Entity
 public class Vaccine extends DomainObject {
 
     String                name;
