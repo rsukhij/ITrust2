@@ -14,6 +14,7 @@ import edu.ncsu.csc.iTrust2.forms.AppointmentRequestForm;
 import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
+
 import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
@@ -35,8 +36,10 @@ public class AppointmentRequestService <T extends AppointmentRequest> extends Se
     @Autowired
     private AppointmentRequestRepository<AppointmentRequest> repository;
 
+
     @Autowired
     private VaccineService                                   vaccService;
+
 
     /** UserService for CRUD operations on User */
     @Autowired

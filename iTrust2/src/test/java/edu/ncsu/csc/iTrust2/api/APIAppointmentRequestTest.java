@@ -75,6 +75,7 @@ public class APIAppointmentRequestTest {
     @Autowired
     private PatientService                                                      patientService;
 
+
     /**
      * Sets up tests
      */
@@ -226,6 +227,7 @@ public class APIAppointmentRequestTest {
         appointmentForm.setDate( "2030-11-20T04:50:00.000-05:00" ); // 2030-11-19
                                                                     // 4:50 AM
                                                                     // EST
+
         appointmentForm.setType( "VACCINATION" );
         appointmentForm.setHcp( "hcp" );
         appointmentForm.setPatient( "patient" );
@@ -238,6 +240,7 @@ public class APIAppointmentRequestTest {
 
         mvc.perform( get( "/api/v1/appointmentrequest" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
+
 
         List<AppointmentRequest> forPatient = arService.findAll();
         Assert.assertEquals( 1, forPatient.size() );

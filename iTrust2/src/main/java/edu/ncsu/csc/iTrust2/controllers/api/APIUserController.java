@@ -63,9 +63,12 @@ public class APIUserController extends APIController {
     /** constant for lab role */
     private static final String       ROLE_OPH        = "ROLE_OPH";
 
+    /** constant for vaccinator role */
+    private static final String       ROLE_VACCINATOR = "ROLE_VACCINATOR";
+
     /** All roles */
     private static final List<String> ALL_ROLES       = List.of( ROLE_ADMIN, ROLE_PATIENT, ROLE_HCP, ROLE_ER,
-            ROLE_LABTECH, ROLE_VIROLOGIST, ROLE_OD, ROLE_OPH );
+            ROLE_LABTECH, ROLE_VIROLOGIST, ROLE_OD, ROLE_OPH, ROLE_VACCINATOR );
 
     /** LoggerUtil */
     @Autowired
@@ -233,7 +236,7 @@ public class APIUserController extends APIController {
 
     /**
      * Generates a set of sample users for the iTrust2 system.
-     * 
+     *
      * @return ResponseEntity indicating that everything is OK
      */
     @PostMapping ( BASE_PATH + "generateUsers" )
@@ -242,9 +245,13 @@ public class APIUserController extends APIController {
 
         final User doc = new Personnel( new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 ) );
 
+        final User vaccinator = new Personnel( new UserForm( "vaccinator", "123456", Role.ROLE_VACCINATOR, 1 ) );
+
         userService.save( admin );
 
         userService.save( doc );
+
+        userService.save( vaccinator );
 
         final User multiRoleDoc = new Personnel( new UserForm( "er", "123456", Role.ROLE_HCP, 1 ) );
         multiRoleDoc.addRole( Role.ROLE_ER );
