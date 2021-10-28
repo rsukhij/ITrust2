@@ -210,7 +210,7 @@ public class APIAppointmentRequestController extends APIController {
                 service.save( request );
             }
             loggerUtil.log( TransactionType.APPOINTMENT_REQUEST_SUBMITTED, request.getPatient(), request.getHcp() );
-            if ( !eligible ) {
+            if ( requestForm.getType().equals( "VACCINATION" ) && !eligible ) {
                 return new ResponseEntity( errorResponse( "Patient is not eligible for vaccine " ),
                         HttpStatus.BAD_REQUEST );
             }
