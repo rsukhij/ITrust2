@@ -35,6 +35,8 @@ public class APIUserTest {
 
     private static final String   USER_2 = "API_USER_2";
 
+    private static final String   USER_3 = "API_USER_3";
+
     private static final String   PW     = "123456";
 
     /**
@@ -88,6 +90,13 @@ public class APIUserTest {
         Assert.assertEquals( "The retrieved user should be a Personnel", Personnel.class, retrieved.getClass() );
 
         Assert.assertEquals( "The retrieved user should have 3 roles", 3, retrieved.getRoles().size() );
+
+        final UserForm u3 = new UserForm( USER_3, PW, Role.ROLE_VACCINATOR, 1 );
+
+        mvc.perform( MockMvcRequestBuilders.post( "/api/v1/users" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( u3 ) ) ).andExpect( MockMvcResultMatchers.status().isOk() );
+
+        Assert.assertEquals( "There should be three users in the system after creating a User", 3, service.count() );
 
     }
 

@@ -28,7 +28,8 @@
 			app.controller('manageAppointmentRequestCtrl', function($scope, $http, dateTimeService) {
 				$scope.appointment = {};
 				$scope.hcps = [];
-				
+                $scope.vaccinators = [];
+         
 				/**
 				 * Gets the personnel for the given role and adds it to the doctors object.
 				 * @param {string} role The role for which to get a list of personnel.
@@ -42,10 +43,12 @@
 						$http.get(`/iTrust2/api/v1/personnel/getbyroles/ROLE_${roleObj}/statistics`).then(
 							function(response) {
 								for (var user of response.data) {
+                                    // check if its an hcp or vaccinator
 									$scope.hcps.push(user);
 								}
 							}, function(rejection) {
 								$scope.hcps = [];
+                                $scope.vaccinators = [];
 								$scope.message = "";
 								$scope.errorMsg += `${roleObj} not found\n`;
 							});
@@ -58,6 +61,7 @@
 				$scope.getHCPsForType = function() {
 					const type = $scope.appointment.type;
 					$scope.hcps = [];
+                    // add vaccinators list
 					
 					if (type === 'GENERAL_OPHTHALMOLOGY') {
 						// Gets all of the ophthalmology personnel
@@ -65,7 +69,10 @@
 					} else if (type === 'OPHTHALMOLOGY_SURGERY') {
 						// Gets all of the ophthalmologist personnel
 						$scope.getPersonnelByRole('OPH');
-					} else {
+					} else if (type === 'VACCINATION') {
+                        // Gets all of the vaccinator personnel
+                        $scope.getPersonnelByRole(['HCP', 'VACCINATOR']);
+                    } else {
 						// Gets all of the doctor personnel
 						$scope.getPersonnelByRole(['HCP']);
 					}
@@ -77,6 +84,15 @@
 				$http.get("/iTrust2/api/v1/appointmenttype")
 					.then(function (response) {
 						$scope.types = response.data;
+					});
+				
+				/**
+				 * Loads the vaccine types from the API.
+				 */
+				$http.get("/iTrust2/api/v1/addVaccine")
+					.then(function (response) {
+						$scope.vaccines = response.data;
+						$scope.selectedVaccine = response.data[0];
 					});
 				
 				/**
@@ -126,6 +142,7 @@
 					if ($scope.errorMsg) {
 						$scope.errorMsg = "Could not submit appointment request\n" + $scope.errorMsg;
 					}
+					$scope.appointment.vaccineType = $scope.selectedVaccine.name;
 					$http.post("/iTrust2/api/v1/appointmentrequests", $scope.appointment).then( 
 						function(response) {	
 							$scope.loadAppointments();
@@ -137,7 +154,7 @@
 							$scope.errorMsg1 = "";
 							$scope.selectedAppointment = {};
 						}, function(rejection) {
-							$scope.errorMsg += "Could not complete appointment request"
+							$scope.errorMsg += rejection.data.message;
 							$scope.message = "";
 							$scope.message1 = "";
 						});
@@ -233,7 +250,16 @@
 											<option ng-repeat="hcp in hcps" value="{{hcp.username}}">{{hcp.username}} ({{hcp.statistics.averageVisitSatisfaction == 0 ? 'N/A' : ((hcp.statistics.averageVisitSatisfaction + hcp.statistics.averageTreatmentSatisfaction) / 2 ) + '/5 stars'}})</option>
 									</select>
 								</div>
-
+								
+								<div ng-show="appointment.type == 'VACCINATION'" class="form-group">
+									<label for="vaccineType">Vaccine Type:
+										</td><select ng-model="selectedVaccine"
+			                          ng-options="vaccine as vaccine.name for vaccine in vaccines"
+								>
+							<option value="">Select Vaccine</option>
+								</select>
+								</div>
+								
 								<div class="form-group">
 									<label for="date">Date:</label> <input id="date" type="date"
 										class="form-control" ng-model="inputDate" name="date"
