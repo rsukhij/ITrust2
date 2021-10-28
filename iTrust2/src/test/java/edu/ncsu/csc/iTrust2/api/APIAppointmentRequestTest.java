@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -33,12 +34,15 @@ import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.Personnel;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.services.AppointmentRequestService;
+import edu.ncsu.csc.iTrust2.services.PatientService;
 import edu.ncsu.csc.iTrust2.services.UserService;
 import edu.ncsu.csc.iTrust2.services.VaccinationAppointmentRequestService;
+import edu.ncsu.csc.iTrust2.services.VaccineService;
 
 /**
  * Test for the API functionality for interacting with appointment requests
@@ -63,7 +67,14 @@ public class APIAppointmentRequestTest {
     private VaccinationAppointmentRequestService<VaccinationAppointmentRequest> vaccReqService;
 
     @Autowired
+    private VaccineService                                                      vaccService;
+
+    @Autowired
     private UserService                                                         service;
+
+    @Autowired
+    private PatientService                                                      patientService;
+
 
     /**
      * Sets up tests
@@ -194,17 +205,30 @@ public class APIAppointmentRequestTest {
      *
      * @throws Exception
      */
+    @SuppressWarnings ( "unchecked" )
     @Test
     @WithMockUser ( username = "patient", roles = { "PATIENT" } )
     @Transactional
     public void testVaccinationAppointmentRequestAPI () throws Exception {
-
+        Patient pat = (Patient) service.findByName( "patient" );
+        // Make patient too young for vax
+        pat.setDateOfBirth( LocalDate.now() );
+        patientService.save( pat );
+        final Vaccine v4 = new Vaccine();
+        v4.setName( "Pfizer" );
+        v4.setAgeMax( 70 );
+        v4.setAgeMin( 5 );
+        v4.setDoseNumber( 1 );
+        v4.setIfSecondDose( false );
+        v4.setDaysBetween( 0 );
+        v4.setIfAvailable( true );
+        vaccService.save( v4 );
         final AppointmentRequestForm appointmentForm = new AppointmentRequestForm();
         appointmentForm.setDate( "2030-11-20T04:50:00.000-05:00" ); // 2030-11-19
                                                                     // 4:50 AM
                                                                     // EST
-        appointmentForm.setType( AppointmentType.VACCINATION.toString() );
-        appointmentForm.setStatus( Status.PENDING.toString() );
+
+        appointmentForm.setType( "VACCINATION" );
         appointmentForm.setHcp( "hcp" );
         appointmentForm.setPatient( "patient" );
         appointmentForm.setComments( "Test appointment please ignore" );
@@ -217,8 +241,19 @@ public class APIAppointmentRequestTest {
         mvc.perform( get( "/api/v1/appointmentrequest" ) ).andExpect( status().isOk() )
                 .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
 
-        final List<AppointmentRequest> forPatient = arService.findAll();
+
+        List<AppointmentRequest> forPatient = arService.findAll();
         Assert.assertEquals( 1, forPatient.size() );
+
+        Assert.assertEquals( Status.REJECTED, forPatient.get( 0 ).getStatus() );
+        pat = (Patient) service.findByName( "patient" );
+        // make patient old enough for vax
+        pat.setDateOfBirth( LocalDate.of( 2005, 5, 25 ) );
+        patientService.save( pat );
+        mvc.perform( post( "/api/v1/appointmentrequests" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( appointmentForm ) ) );
+        forPatient = arService.findAll();
+        Assert.assertEquals( Status.APPROVED, forPatient.get( 1 ).getStatus() );
 
     }
 

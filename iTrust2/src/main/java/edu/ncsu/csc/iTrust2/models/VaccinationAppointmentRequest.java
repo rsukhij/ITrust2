@@ -1,9 +1,10 @@
 package edu.ncsu.csc.iTrust2.models;
 
 import javax.persistence.Entity;
-import javax.validation.constraints.NotEmpty;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.validation.constraints.NotNull;
 
-import org.hibernate.validator.constraints.Length;
 
 /**
  * Represents a VaccinationAppointmentRequest in the system
@@ -17,16 +18,18 @@ public class VaccinationAppointmentRequest extends AppointmentRequest {
     /**
      * Name of the vaccine
      */
-    @NotEmpty
-    @Length ( max = 64 )
-    private String vaccineType;
+    @NotNull
+    @ManyToOne
+    @JoinColumn ( name = "vaccine_name", columnDefinition = "varchar(100)" )
+    private Vaccine vaccineType;
+
 
     /**
      * Sets the vaccine type
      *
      * @return return the vaccine type
      */
-    public String getVaccineType () {
+    public Vaccine getVaccineType () {
         return vaccineType;
     }
 
@@ -36,7 +39,7 @@ public class VaccinationAppointmentRequest extends AppointmentRequest {
      * @param vaccineType
      *            the vaccine type
      */
-    public void setVaccineType ( final String vaccineType ) {
+    public void setVaccineType ( final Vaccine vaccineType ) {
         this.vaccineType = vaccineType;
     }
 }

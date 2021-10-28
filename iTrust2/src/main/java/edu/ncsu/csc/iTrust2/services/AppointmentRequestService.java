@@ -14,6 +14,8 @@ import edu.ncsu.csc.iTrust2.forms.AppointmentRequestForm;
 import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
+
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.repositories.AppointmentRequestRepository;
@@ -33,6 +35,11 @@ public class AppointmentRequestService <T extends AppointmentRequest> extends Se
     /** Repository for CRUD tasks */
     @Autowired
     private AppointmentRequestRepository<AppointmentRequest> repository;
+
+
+    @Autowired
+    private VaccineService                                   vaccService;
+
 
     /** UserService for CRUD operations on User */
     @Autowired
@@ -88,9 +95,10 @@ public class AppointmentRequestService <T extends AppointmentRequest> extends Se
      */
     public AppointmentRequest build ( final AppointmentRequestForm raf ) {
         AppointmentRequest ar = new AppointmentRequest();
-        if ( raf.getType() == AppointmentType.VACCINATION.toString() ) {
+        if ( raf.getType().equals( "VACCINATION" ) ) {
             final VaccinationAppointmentRequest temp = new VaccinationAppointmentRequest();
-            temp.setVaccineType( raf.getVaccineType() );
+            final Vaccine vacc = vaccService.findByVaccineName( raf.getVaccineType() );
+            temp.setVaccineType( vacc );
             ar = temp;
         }
         ar.setPatient( userService.findByName( raf.getPatient() ) );
