@@ -92,7 +92,7 @@ public class AppointmentRequestService <T extends AppointmentRequest> extends Se
      */
     public AppointmentRequest build ( final AppointmentRequestForm raf ) {
         AppointmentRequest ar = new AppointmentRequest();
-        if ( raf.getType() == AppointmentType.VACCINATION.toString() ) {
+        if ( raf.getType().equals( "VACCINATION" ) ) {
             final VaccinationAppointmentRequest temp = new VaccinationAppointmentRequest();
             final Vaccine vacc = vaccService.findByVaccineName( raf.getVaccineType() );
             temp.setVaccineType( vacc );

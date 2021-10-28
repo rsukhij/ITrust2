@@ -20,7 +20,6 @@ import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
-import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.models.enums.TransactionType;
@@ -173,20 +172,13 @@ public class APIAppointmentRequestController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity createAppointmentRequest ( @RequestBody final AppointmentRequestForm requestForm ) {
         try {
-            if ( requestForm.getType() == AppointmentType.VACCINATION.toString() && requestForm.getVaccineType() != null
+            boolean eligible = false;
+            if ( requestForm.getType().equals( "VACCINATION" ) && requestForm.getVaccineType() != null
                     && vaccService.findByVaccineName( requestForm.getVaccineType() ) != null ) {
                 final Patient patient = (Patient) patientService.findByName( LoggerUtil.currentUser() );
-                final boolean eligible = vaccService.findByVaccineName( requestForm.getVaccineType() )
-                        .isEligible( patient );
-                if ( !eligible ) {
-                    return new ResponseEntity( errorResponse( "Patient is not eligible for vaccine" ),
-                            HttpStatus.BAD_REQUEST );
-                }
+                eligible = vaccService.findByVaccineName( requestForm.getVaccineType() ).isEligible( patient );
             }
 
-            if ( requestForm.getType() == AppointmentType.VACCINATION.toString() ) {
-
-            }
             final AppointmentRequest request = service.build( requestForm );
 
             if ( null != service.findById( request.getId() ) ) {
@@ -194,13 +186,23 @@ public class APIAppointmentRequestController extends APIController {
                         errorResponse( "AppointmentRequest with the id " + request.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
-            if ( requestForm.getType() == AppointmentType.VACCINATION.toString() ) {
+            if ( requestForm.getType().equals( "VACCINATION" ) ) {
+                if ( eligible ) {
+                    request.setStatus( Status.APPROVED );
+                }
+                else {
+                    request.setStatus( Status.REJECTED );
+                }
                 vaccReqService.save( (VaccinationAppointmentRequest) request );
             }
             else {
                 service.save( request );
             }
             loggerUtil.log( TransactionType.APPOINTMENT_REQUEST_SUBMITTED, request.getPatient(), request.getHcp() );
+            if ( !eligible ) {
+                return new ResponseEntity( errorResponse( "Patient is not eligible for vaccine " ),
+                        HttpStatus.BAD_REQUEST );
+            }
             return new ResponseEntity( request, HttpStatus.OK );
         }
         catch ( final Exception e ) {

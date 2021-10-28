@@ -51,4 +51,31 @@ public enum AppointmentType {
     public int getCode () {
         return code;
     }
+
+    /**
+     * Converts a code to a named smoking status.
+     *
+     * @param code
+     *            The smoking code.
+     * @return The string represented by the code.
+     */
+    public static String getName ( final int code ) {
+        return AppointmentType.parseValue( code ).toString();
+    }
+
+    /**
+     * Returns the PatientSmokingStatus enum that matches the given code.
+     *
+     * @param code
+     *            The code to match
+     * @return Corresponding PatientSmokingStatus object.
+     */
+    public static AppointmentType parseValue ( final int code ) {
+        for ( final AppointmentType status : values() ) {
+            if ( status.getCode() == code ) {
+                return status;
+            }
+        }
+        return AppointmentType.GENERAL_CHECKUP;
+    }
 }
