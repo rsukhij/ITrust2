@@ -70,6 +70,19 @@ public class AdminController {
     }
 
     /**
+     * Retrieves the form for the Vaccine action
+     *
+     * @param model
+     *            Data for front end
+     * @return The page to display
+     */
+    @RequestMapping ( value = "admin/vaccines" )
+    @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
+    public String vaccines ( final Model model ) {
+        return "admin/vaccines";
+    }
+
+    /**
      * Add code
      *
      * @param model
