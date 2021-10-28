@@ -29,6 +29,7 @@
 				$scope.appointment = {};
 				$scope.hcps = [];
                 $scope.vaccinators = [];
+                $scope.vaccines = [];
 				
 				/**
 				 * Gets the personnel for the given role and adds it to the doctors object.
@@ -43,7 +44,6 @@
 						$http.get(`/iTrust2/api/v1/personnel/getbyroles/ROLE_${roleObj}/statistics`).then(
 							function(response) {
 								for (var user of response.data) {
-                                    // check if its an hcp or vaccinator
 									$scope.hcps.push(user);
 								}
 							}, function(rejection) {
@@ -54,6 +54,31 @@
 							});
 					}
 				}
+				
+				 /**
+					 * Gets the personnel for the given role and adds it to the doctors object.
+					 * @param {string} role The role for which to get a list of personnel.
+					 */
+					$scope.getVaccine = function(vaccineObj) {
+						if (Array.isArray(vaccineObj)) {
+							for (var vaccine of vaccineObj) {
+								$scope.getVaccine(vaccine);
+							}
+						} else {
+							$http.get(`/iTrust2/api/v1/addVaccine/VACCINE_${vaccineObj}`).then(
+							
+								function(response) {
+									for (var v of response.data) {
+										$scope.vaccines.push(v);
+									}
+								}, function(rejection) {
+									$scope.vaccines = [];
+	                              //  $scope.vaccinators = [];
+									$scope.message = "";
+									$scope.errorMsg += `${vaccineObj} not found\n`;
+								});
+						}
+					}
 				
 				/**
 				 * Loads the proper list of HCPs for the current appointment type.
@@ -77,6 +102,30 @@
 						$scope.getPersonnelByRole(['HCP']);
 					}
 				}
+				
+				/**
+				 * Loads the proper list of vaccines for the current appointment type.
+				 */
+				$scope.getHCPsForType = function() {
+					const vtype = $scope.appointment.type;
+					$scope.hcps = [];
+					
+					if (type === 'VACCINATION') {
+						// Gets all of the ophthalmology personnel
+						$scope.getPersonnelByRole(['OD', 'OPH']);
+					} else if (type === 'OPHTHALMOLOGY_SURGERY') {
+						// Gets all of the ophthalmologist personnel
+						$scope.getPersonnelByRole('OPH');
+					} else if (type === 'VACCINATION') {
+                        // Gets all of the vaccinator personnel
+                        $scope.getPersonnelByRole(['HCP', 'VACCINATOR']);
+                    } else {
+						// Gets all of the doctor personnel
+						$scope.getPersonnelByRole(['HCP']);
+					}
+				}
+                
+ 
 				
 				/**
 				 * Loads the appointment types from the API.
@@ -240,6 +289,17 @@
 											<option ng-repeat="hcp in hcps" value="{{hcp.username}}">{{hcp.username}} ({{hcp.statistics.averageVisitSatisfaction == 0 ? 'N/A' : ((hcp.statistics.averageVisitSatisfaction + hcp.statistics.averageTreatmentSatisfaction) / 2 ) + '/5 stars'}})</option>
 									</select>
 								</div>
+                                
+                                <div class="form-group">
+                                    <label for="vaccine">Vaccine:</label> <select
+                                    ng-model="vaccine.name" name="name" id="name" 
+                                    class="form-control" ng-disabled="!appointment.type">
+                                        <option ng-repeat="name in names" value="{{name}}">
+                                        {{name | humanize}}</option>
+                                    
+                                    </select>
+                                    
+                                </div>
 
 								<div class="form-group">
 									<label for="date">Date:</label> <input id="date" type="date"
