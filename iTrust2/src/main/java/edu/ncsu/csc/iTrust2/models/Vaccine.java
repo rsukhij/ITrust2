@@ -10,15 +10,15 @@ import javax.persistence.Id;
 public class Vaccine extends DomainObject {
 
     @Id
-    String         name;
+    String  name;
 
-    int            ageMin;
-    int            ageMax;
+    int     ageMin;
+    int     ageMax;
     // String ageRange;
-    static int     doseNumber;
-    boolean        ifSecondDose;
-    int            daysBetween;
-    static boolean ifAvailable;
+    int     doseNumber;
+    boolean ifSecondDose;
+    int     daysBetween;
+    boolean ifAvailable;
 
     public Vaccine () {
         setName( name );
@@ -55,7 +55,7 @@ public class Vaccine extends DomainObject {
         this.ageMax = ageMax;
     }
 
-    public static int getDoseNumber () {
+    public int getDoseNumber () {
         return doseNumber;
     }
 
@@ -79,7 +79,7 @@ public class Vaccine extends DomainObject {
         this.daysBetween = daysBetween;
     }
 
-    public static boolean getIfAvailable () {
+    public boolean getIfAvailable () {
         return ifAvailable;
     }
 
@@ -90,14 +90,13 @@ public class Vaccine extends DomainObject {
     public void editVaccine ( final String name, final int ageMin, final int ageMax, final int doseNumber,
             final boolean ifSecondDose, final int daysBetween, final boolean ifAvailable ) {
 
-        final Vaccine vaccine = new Vaccine();
-        vaccine.setName( name );
-        vaccine.setAgeMin( ageMin );
-        vaccine.setAgeMax( ageMax );
-        vaccine.setDoseNumber( doseNumber );
-        vaccine.setIfSecondDose( ifSecondDose );
-        vaccine.setDaysBetween( daysBetween );
-        vaccine.setIfAvailable( ifAvailable );
+        setName( name );
+        setAgeMin( ageMin );
+        setAgeMax( ageMax );
+        setDoseNumber( doseNumber );
+        setIfSecondDose( ifSecondDose );
+        setDaysBetween( daysBetween );
+        setIfAvailable( ifAvailable );
 
     }
 

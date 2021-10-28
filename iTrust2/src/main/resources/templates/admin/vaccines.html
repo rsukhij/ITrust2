@@ -32,17 +32,21 @@
     		if (vaccine.doseNumber < 1) {
     			err.push("Number of Doses must be above 0");
     		}
-    		if (vaccine.daysBetween > 0) {
+    		if (vaccine.daysBetween < 0) {
     			err.push("Days Between doses must be positive");
+    		}
+    		if (vaccine.ageMax <= vaccine.ageMin) {
+    			err.push("Maximum age must be greater then Minimum");
     		}
     		return err.join(". ");
     	}
 
         $scope.vaccines = [];
         $scope.loadTable = function () {
-          $http.get("/iTrust2/api/v1/addVaccine/vaccines").then(
+          $http.get("/iTrust2/api/v1/addVaccine").then(
             function (response) {
               $scope.vaccines = response.data;
+              //$scope.vaccine.isAvailable = false;
               $scope.message = "";
             }, function (rejection) {
               $scope.vaccines = [];
@@ -59,26 +63,17 @@
               function (response) {
                 $scope.loadTable();
                 $scope.vaccine.name = "";
-                $scope.vaccine.minAge = 0;
-                $scope.vaccine.maxAge = 0;
+                $scope.vaccine.ageMin = 0;
+                $scope.vaccine.ageMax = 0;
                 $scope.vaccine.doseNumber = 0;
                 $scope.vaccine.daysBetween = 0;
+                $scope.vaccine.isAvailable = false;
                 $scope.errorAdding = "";
               }, function (rejection) {
                 $scope.errorAdding = "Could not add vaccine";
               });
           }
 
-        }
-
-        $scope.deleteVaccine = function (vaccine) {
-          $http.delete('/iTrust2/api/v1/addVaccine/' + vaccine.name).then(
-            function (response) {
-              $scope.loadTable();
-              $scope.message = "";
-            }, function (rejection) {
-              $scope.message = "Could not remove vaccine";
-            })
         }
 
         // gets the template to ng-include for a table row / item
@@ -97,7 +92,7 @@
           if (err) {
             $scope.errorAdding = err;
           } else {
-            $http.put('/iTrust2/api/v1/addVaccine/' + $scope.selectedVaccine.name).then(
+            $http.put('/iTrust2/api/v1/addVaccine', $scope.selectedVaccine).then(
               function (response) {
                 $scope.loadTable();
                 $scope.resetSelected();         
@@ -133,10 +128,11 @@
 									<thead>
 										<tr>
 											<th>Name</th>
-											<th>Type</th>
+											<th>Number of Doses</th>
 											<th>Minimum Age</th>
 											<th>Maximum Age</th>
 											<th>Time Between Doses</th>
+											<th>Available</th>
 											<th>Action</th>
 										</tr>
 									</thead>
@@ -151,16 +147,14 @@
 								<script type="text/ng-template" id="view">
                   <td name="nameCell">{{v.name}}</td>
 				  <td name="typeCell">{{v.doseNumber}}</td>
-                  <td name="minCell">{{v.minAge}}</td>
-				  <td name="maxCell">{{v.maxAge}}</td>
+                  <td name="minCell">{{v.ageMin}}</td>
+				  <td name="maxCell">{{v.ageMax}}</td>
 				  <td name="timeCell">{{v.daysBetween}}</td>
+				  <td name="availCell">{{v.ifAvailable}}</td>
                   <td>
                     <div class="row text-center">
                       <div class="col-md-6">
                         <input type="button" value="Edit" class="btn btn-primary" name="editVaccine" ng-click="editVaccine(v)" />                         
-                      </div>
-                      <div class="col-md-6">
-                          <input type="button" value="Delete" class="btn btn-danger" name="deleteVaccine" ng-click="deleteVaccine(v)" />                          
                       </div>
                     </div>
                   </td>
@@ -175,13 +169,16 @@
 					<input type="number" class="form-control" ng-model="selectedVaccine.doseNumber" />
                   </td>
                   <td name="minCell">
-					<input type="text" class="form-control" ng-model="selectedVaccine.minAge" />
+					<input type="number" class="form-control" ng-model="selectedVaccine.ageMin" />
                   </td>
 				  <td name="maxCell">
-					<input type="text" class="form-control" ng-model="selectedVaccine.maxAge" />
+					<input type="number" class="form-control" ng-model="selectedVaccine.ageMax" />
                   </td>
 				  <td name="timeCell">
-					<input type="text" class="form-control" ng-model="selectedVaccine.timeBetween" />
+					<input type="number" class="form-control" ng-model="selectedVaccine.daysBetween" />
+                  </td>
+				  <td name="availCell">
+					<input type="checkbox" name="available" class="checkbox" value = true ng-model="selectedVaccine.ifAvailable" />
                   </td>
 
                   <td>
@@ -208,27 +205,27 @@
 														<div class="col-md-4">
 															<label>Name</label> <input type="text"
 																class="form-control" name="vaccine" ng-model="vaccine.name"
-																required />
+																placeholder = "Name of Vaccine" required />
 														</div>
 														<div class="col-md-4">
-															<label>Type</label> <input type="number" 
+															<label>Number of Doses</label> <input type="number" 
 																class="form-control" name="doses" ng-model="vaccine.doseNumber" 
-																required />
+																placeholder = "Number of Doses" required />
 														</div>
 														<div class="col-md-4">
 															<label>Minimum Age</label> <input type="number" 
-																class="form-control" name="minage" ng-model="vaccine.minAge" 
-																required />
+																class="form-control" name="minage" ng-model="vaccine.ageMin" 
+																placeholder = "Min Age for Vaccine" required />
 														</div>
 														<div class="col-md-4">
 															<label>Maximum Age</label> <input type="number" 
-																class="form-control" name="maxage" ng-model="vaccine.maxAge" 
-																required />
+																class="form-control" name="maxage" ng-model="vaccine.ageMax" 
+																placeholder = "Max Age for Vaccine" required />
 														</div>
 														<div class="col-md-4">
 															<label>Time Between Doses (Days)</label> <input type="number" 
 																class="form-control" name="days" ng-model="vaccine.daysBetween" 
-																required />
+																placeholder = "Days Between Doses" required />
 														</div>
 													</div>
 													<div class="row">
