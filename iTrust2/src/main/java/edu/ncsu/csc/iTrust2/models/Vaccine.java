@@ -127,6 +127,9 @@ public class Vaccine extends DomainObject {
     }
 
     public boolean isEligible ( final Patient patient ) {
+        if ( patient.getDateOfBirth() == null ) {
+            return false;
+        }
         final long daysAfterBirth = Duration
                 .between( patient.getDateOfBirth().atStartOfDay(), LocalDate.now().atStartOfDay() ).toDays();
         final int approxAge = (int) ( daysAfterBirth / 365.2425 );
