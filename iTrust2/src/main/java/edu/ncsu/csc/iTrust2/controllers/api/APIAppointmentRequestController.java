@@ -20,6 +20,9 @@ import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
+
+import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
+
 import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.models.enums.TransactionType;
@@ -55,17 +58,21 @@ public class APIAppointmentRequestController extends APIController {
     @Autowired
     private LoggerUtil                                                          loggerUtil;
 
+
     /** VaccineService */
     @Autowired
     private VaccineService                                                      vaccService;
+
 
     /** User service */
     @Autowired
     private UserService<User>                                                   userService;
 
+
     /** Patient service */
     @Autowired
     private PatientService                                                      patientService;
+
 
     /**
      * Retrieves a list of all AppointmentRequests in the database
@@ -172,12 +179,14 @@ public class APIAppointmentRequestController extends APIController {
     @PreAuthorize ( "hasRole('ROLE_PATIENT')" )
     public ResponseEntity createAppointmentRequest ( @RequestBody final AppointmentRequestForm requestForm ) {
         try {
+
             boolean eligible = false;
             if ( requestForm.getType().equals( "VACCINATION" ) && requestForm.getVaccineType() != null
                     && vaccService.findByVaccineName( requestForm.getVaccineType() ) != null ) {
                 final Patient patient = (Patient) patientService.findByName( LoggerUtil.currentUser() );
                 eligible = vaccService.findByVaccineName( requestForm.getVaccineType() ).isEligible( patient );
             }
+
 
             final AppointmentRequest request = service.build( requestForm );
 
@@ -186,6 +195,7 @@ public class APIAppointmentRequestController extends APIController {
                         errorResponse( "AppointmentRequest with the id " + request.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
+
             if ( requestForm.getType().equals( "VACCINATION" ) ) {
                 if ( eligible ) {
                     request.setStatus( Status.APPROVED );
@@ -193,6 +203,7 @@ public class APIAppointmentRequestController extends APIController {
                 else {
                     request.setStatus( Status.REJECTED );
                 }
+
                 vaccReqService.save( (VaccinationAppointmentRequest) request );
             }
             else {
