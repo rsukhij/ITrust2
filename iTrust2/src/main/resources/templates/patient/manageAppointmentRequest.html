@@ -28,6 +28,7 @@
 			app.controller('manageAppointmentRequestCtrl', function($scope, $http, dateTimeService) {
 				$scope.appointment = {};
 				$scope.hcps = [];
+                $scope.vaccinators = [];
 				
 				/**
 				 * Gets the personnel for the given role and adds it to the doctors object.
@@ -42,10 +43,12 @@
 						$http.get(`/iTrust2/api/v1/personnel/getbyroles/ROLE_${roleObj}/statistics`).then(
 							function(response) {
 								for (var user of response.data) {
+                                    // check if its an hcp or vaccinator
 									$scope.hcps.push(user);
 								}
 							}, function(rejection) {
 								$scope.hcps = [];
+                                $scope.vaccinators = [];
 								$scope.message = "";
 								$scope.errorMsg += `${roleObj} not found\n`;
 							});
@@ -58,6 +61,7 @@
 				$scope.getHCPsForType = function() {
 					const type = $scope.appointment.type;
 					$scope.hcps = [];
+                    // add vaccinators list
 					
 					if (type === 'GENERAL_OPHTHALMOLOGY') {
 						// Gets all of the ophthalmology personnel
@@ -65,7 +69,10 @@
 					} else if (type === 'OPHTHALMOLOGY_SURGERY') {
 						// Gets all of the ophthalmologist personnel
 						$scope.getPersonnelByRole('OPH');
-					} else {
+					} else if (type === 'VACCINATION') {
+                        // Gets all of the vaccinator personnel
+                        $scope.getPersonnelByRole(['HCP', 'VACCINATOR']);
+                    } else {
 						// Gets all of the doctor personnel
 						$scope.getPersonnelByRole(['HCP']);
 					}

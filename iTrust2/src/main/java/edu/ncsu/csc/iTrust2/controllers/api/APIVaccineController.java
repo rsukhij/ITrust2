@@ -31,6 +31,12 @@ public class APIVaccineController extends APIController {
     @PostMapping ( BASE_PATH + "/addVaccine" )
     public ResponseEntity addVaccine ( @RequestBody final Vaccine vaccine ) {
 
+        if ( vaccine.getIfAvailable() == false ) {
+            return new ResponseEntity(
+                    errorResponse( "Vaccine with the name " + vaccine.getName() + " is not available" ),
+                    HttpStatus.CONFLICT );
+        }
+
         if ( null != service.findByVaccineName( vaccine.getName() ) ) {
             return new ResponseEntity(
                     errorResponse( "Vaccine with the name " + vaccine.getName() + " already exists" ),
