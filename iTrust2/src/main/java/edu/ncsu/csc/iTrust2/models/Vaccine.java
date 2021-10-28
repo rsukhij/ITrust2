@@ -94,14 +94,13 @@ public class Vaccine extends DomainObject {
     public void editVaccine ( final String name, final int ageMin, final int ageMax, final int doseNumber,
             final boolean ifSecondDose, final int daysBetween, final boolean ifAvailable ) {
 
-        final Vaccine vaccine = new Vaccine();
-        vaccine.setName( name );
-        vaccine.setAgeMin( ageMin );
-        vaccine.setAgeMax( ageMax );
-        vaccine.setDoseNumber( doseNumber );
-        vaccine.setIfSecondDose( ifSecondDose );
-        vaccine.setDaysBetween( daysBetween );
-        vaccine.setIfAvailable( ifAvailable );
+        setName( name );
+        setAgeMin( ageMin );
+        setAgeMax( ageMax );
+        setDoseNumber( doseNumber );
+        setIfSecondDose( ifSecondDose );
+        setDaysBetween( daysBetween );
+        setIfAvailable( ifAvailable );
 
     }
 
