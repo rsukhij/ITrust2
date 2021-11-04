@@ -118,7 +118,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return list of appointment requests for the logged in hcp
      */
     @GetMapping ( BASE_PATH + "/appointmentrequestForHCP" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_VACCINATOR')" )
     public List<AppointmentRequest> getAppointmentRequestsForHCP () {
 
         final User hcp = userService.findByName( LoggerUtil.currentUser() );
@@ -316,7 +316,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return The page to display for the user
      */
     @GetMapping ( BASE_PATH + "/viewAppointments" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_VACCINATOR')" )
     public List<AppointmentRequest> upcomingAppointments () {
         final User hcp = userService.findByName( LoggerUtil.currentUser() );
 
