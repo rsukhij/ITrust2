@@ -80,14 +80,28 @@ public class Patient extends User {
     @Enumerated ( EnumType.STRING )
     private State  state;
 
+    /**
+     * Getter method for the patient's vaccination status
+     *
+     * @return PatientVaccination Status for the patient
+     */
     public PatientVaccinationStatus getVaccinationStatus () {
         return vaccinationStatus;
     }
 
+    /**
+     * Setter method for the patient's vaccination status
+     *
+     * @param vaccinationStatus
+     *            the status to set for the patient
+     */
     public void setVaccinationStatus ( final PatientVaccinationStatus vaccinationStatus ) {
         this.vaccinationStatus = vaccinationStatus;
     }
 
+    /**
+     * Field to hold the value of the patient's vaccine status
+     */
     @Enumerated ( EnumType.STRING )
     private PatientVaccinationStatus vaccinationStatus;
 
