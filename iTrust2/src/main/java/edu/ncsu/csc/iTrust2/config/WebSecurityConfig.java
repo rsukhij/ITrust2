@@ -24,7 +24,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
  * Configures Spring security. Tells Spring how to find users in the system,
  * which API routes (don't) require authentication, and configures a few other
  * pieces of the security system.
- * 
+ *
  * @author Kai Presler-Marshall
  *
  */
@@ -63,7 +63,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .usersByUsernameQuery( "select username,password,enabled from user WHERE username = ?;" )
                 .authoritiesByUsernameQuery( "select user_username, roles from user_roles where user_username=?" );
         auth.authenticationEventPublisher( defaultAuthenticationEventPublisher() );
-
+        // TODO refactor search here
     }
 
     /**
