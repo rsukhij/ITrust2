@@ -1,5 +1,7 @@
 package edu.ncsu.csc.iTrust2.models;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.time.ZonedDateTime;
 
 import javax.persistence.Basic;
@@ -20,6 +22,7 @@ import com.google.gson.annotations.JsonAdapter;
 
 import edu.ncsu.csc.iTrust2.adapters.ZonedDateTimeAdapter;
 import edu.ncsu.csc.iTrust2.adapters.ZonedDateTimeAttributeConverter;
+import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
 
 /**
  * This is the validated database-persisted vaccination visit representation
@@ -36,7 +39,7 @@ public class VaccinationVisit extends OfficeVisit {
     @NotNull
     @ManyToOne
     @JoinColumn ( name = "patient_id", columnDefinition = "varchar(100)" )
-    private User                          patient;
+    private Patient                       patient;
 
     /**
      * The hcp of this vaccination visit
@@ -106,8 +109,7 @@ public class VaccinationVisit extends OfficeVisit {
      * @param patient
      *            the patient to set
      */
-    @Override
-    public void setPatient ( final User patient ) {
+    public void setPatient ( final Patient patient ) {
         this.patient = patient;
     }
 
@@ -237,7 +239,13 @@ public class VaccinationVisit extends OfficeVisit {
      * vaccine they are receiving
      */
     public void validateAge () {
+        final LocalDate appointmentDate = date.toLocalDate();
+        final Period period = Period.between( patient.getDateOfBirth(), appointmentDate );
+        final int age = period.getYears();
 
+        if ( ! ( age > vaccine.getAgeMin() && age < vaccine.getAgeMax() ) ) {
+            throw new IllegalArgumentException( "Invalid age for this vaccine" );
+        }
     }
 
     /**
@@ -245,6 +253,23 @@ public class VaccinationVisit extends OfficeVisit {
      * documenting an initial visit, there will be an error
      */
     public void validateVisitNumber () {
+        if ( vaccine.getIfSecondDose() ) {
+            if ( patient.getVaccinationStatus().equals( 0 ) && visitNumber == 2 ) {
+                throw new IllegalArgumentException(
+                        "Can't document a second appointment if there has not been a previous one." );
+            }
+        }
+    }
 
+    /**
+     * Updates the vaccination status based on a change in visitNumber
+     */
+    public void updatePatientVaccinationStatus () {
+        if ( !vaccine.ifSecondDose && visitNumber == 1 || vaccine.ifSecondDose && visitNumber == 2 ) {
+            patient.setVaccinationStatus( PatientVaccinationStatus.FULLY_VACCINATED );
+        }
+        if ( vaccine.ifSecondDose && visitNumber == 1 ) {
+            patient.setVaccinationStatus( PatientVaccinationStatus.PARTIALLY_VACCINATED );
+        }
     }
 }
