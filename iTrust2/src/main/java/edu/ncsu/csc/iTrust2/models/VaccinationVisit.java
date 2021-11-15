@@ -33,21 +33,21 @@ import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
 
 @Entity
 public class VaccinationVisit extends OfficeVisit {
-    /**
-     * The patient of this vaccination visit
-     */
-    @NotNull
-    @ManyToOne
-    @JoinColumn ( name = "patient_id", columnDefinition = "varchar(100)" )
-    private Patient                       patient;
+    // /**
+    // * The patient of this vaccination visit
+    // */
+    // @NotNull
+    // @ManyToOne
+    // @JoinColumn ( name = "patient_id", columnDefinition = "varchar(100)" )
+    // private Patient patient;
 
-    /**
-     * The hcp of this vaccination visit
-     */
-    @NotNull
-    @ManyToOne
-    @JoinColumn ( name = "hcp_id", columnDefinition = "varchar(100)" )
-    private User                          hcp;
+    // /**
+    // * The hcp of this vaccination visit
+    // */
+    // @NotNull
+    // @ManyToOne
+    // @JoinColumn ( name = "hcp_id", columnDefinition = "varchar(100)" )
+    // private User hcp;
 
     /**
      * The vaccinator of this vaccination visit
@@ -93,42 +93,47 @@ public class VaccinationVisit extends OfficeVisit {
     @JoinColumn ( name = "appointment_id" )
     private VaccinationAppointmentRequest appointment;
 
+    /**
+     * Office Visit
+     */
+    OfficeVisit                           ov = new OfficeVisit();
+
     /** For Hibernate/Thymeleaf _must_ be an empty constructor */
     public VaccinationVisit () {
     }
+    //
+    // /**
+    // * @return the patient
+    // */
+    // @Override
+    // public User getPatient () {
+    // return patient;
+    // }
+    //
+    // /**
+    // * @param patient
+    // * the patient to set
+    // */
+    // public void setPatient ( final Patient patient ) {
+    // this.patient = patient;
+    // }
 
-    /**
-     * @return the patient
-     */
-    @Override
-    public User getPatient () {
-        return patient;
-    }
-
-    /**
-     * @param patient
-     *            the patient to set
-     */
-    public void setPatient ( final Patient patient ) {
-        this.patient = patient;
-    }
-
-    /**
-     * @return the hcp
-     */
-    @Override
-    public User getHcp () {
-        return hcp;
-    }
-
-    /**
-     * @param hcp
-     *            the hcp to set
-     */
-    @Override
-    public void setHcp ( final User hcp ) {
-        this.hcp = hcp;
-    }
+    // /**
+    // * @return the hcp
+    // */
+    // @Override
+    // public User getHcp () {
+    // return hcp;
+    // }
+    //
+    // /**
+    // * @param hcp
+    // * the hcp to set
+    // */
+    // @Override
+    // public void setHcp ( final User hcp ) {
+    // this.hcp = hcp;
+    // }
 
     /**
      * @return the vaccinator
@@ -239,8 +244,9 @@ public class VaccinationVisit extends OfficeVisit {
      * vaccine they are receiving
      */
     public void validateAge () {
+        final Patient p = (Patient) ov.getPatient();
         final LocalDate appointmentDate = date.toLocalDate();
-        final Period period = Period.between( patient.getDateOfBirth(), appointmentDate );
+        final Period period = Period.between( p.getDateOfBirth(), appointmentDate );
         final int age = period.getYears();
 
         if ( ! ( age > vaccine.getAgeMin() && age < vaccine.getAgeMax() ) ) {
@@ -253,8 +259,9 @@ public class VaccinationVisit extends OfficeVisit {
      * documenting an initial visit, there will be an error
      */
     public void validateVisitNumber () {
+        final Patient p = (Patient) ov.getPatient();
         if ( vaccine.getIfSecondDose() ) {
-            if ( patient.getVaccinationStatus().equals( 0 ) && visitNumber == 2 ) {
+            if ( p.getVaccinationStatus().equals( 0 ) && visitNumber == 2 ) {
                 throw new IllegalArgumentException(
                         "Can't document a second appointment if there has not been a previous one." );
             }
@@ -265,11 +272,12 @@ public class VaccinationVisit extends OfficeVisit {
      * Updates the vaccination status based on a change in visitNumber
      */
     public void updatePatientVaccinationStatus () {
+        final Patient p = (Patient) ov.getPatient();
         if ( !vaccine.ifSecondDose && visitNumber == 1 || vaccine.ifSecondDose && visitNumber == 2 ) {
-            patient.setVaccinationStatus( PatientVaccinationStatus.FULLY_VACCINATED );
+            p.setVaccinationStatus( PatientVaccinationStatus.FULLY_VACCINATED );
         }
         if ( vaccine.ifSecondDose && visitNumber == 1 ) {
-            patient.setVaccinationStatus( PatientVaccinationStatus.PARTIALLY_VACCINATED );
+            p.setVaccinationStatus( PatientVaccinationStatus.PARTIALLY_VACCINATED );
         }
     }
 }
