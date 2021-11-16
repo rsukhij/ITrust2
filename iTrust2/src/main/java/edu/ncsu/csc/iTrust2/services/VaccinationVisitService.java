@@ -100,10 +100,6 @@ public class VaccinationVisitService extends Service<VaccinationVisit, Long> {
         ov.setPatient( userService.findByName( visitForm.getPatient() ) );
         ov.setHcp( userService.findByName( visitForm.getHcp() ) );
 
-        if ( visitForm.getId() != null ) {
-            ov.setId( Long.parseLong( visitForm.getId() ) );
-        }
-
         final ZonedDateTime visitDate = ZonedDateTime.parse( visitForm.getDate() );
         ov.setDate( visitDate );
 

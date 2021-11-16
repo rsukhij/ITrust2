@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotEmpty;
 
+import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
 
 /**
@@ -31,41 +32,47 @@ public class VaccinationVisitForm implements Serializable {
      * Name of the Patient involved in the VaccinationVisit
      */
     @NotEmpty
-    private String patient;
+    private String             patient;
 
     /**
      * Name of the HCP involved in the VaccinationVisit
      */
     @NotEmpty
-    private String hcp;
+    private String             hcp;
 
     /**
      * Date at which the VaccinationVisit occurred
      */
     @NotEmpty
-    private String date;
-
-    /**
-     * ID of the VaccinationVisit
-     */
-    private String id;
+    private String             date;
 
     /**
      * Type of the Vaccine.
      */
     @NotEmpty
-    private String type;
+    private String             type;
 
     /**
      * Dose Number
      */
     @NotEmpty
-    private int    dose;
+    private int                dose;
 
     /**
      * Whether the VaccinationVisit was prescheduled or not
      */
-    public String  preScheduled;
+    public String              preScheduled;
+
+    /**
+     * Date at which the followup visit should
+     */
+    @NotEmpty
+    private String             followupdate;
+
+    /**
+     * Appointment Request of Vaccination Visit
+     */
+    private AppointmentRequest appointment;
 
     /**
      * Creates an VaccinationVisitForm from the VaccinationVisit provided
@@ -143,25 +150,6 @@ public class VaccinationVisitForm implements Serializable {
 
     public void setDose ( final int dose ) {
         this.dose = dose;
-    }
-
-    /**
-     * Gets the ID of the VaccinationVisit
-     *
-     * @return ID of the Visit
-     */
-    public String getId () {
-        return this.id;
-    }
-
-    /**
-     * Sets the ID of the VaccinationVisit
-     *
-     * @param id
-     *            The ID of the VaccinationVisit
-     */
-    public void setId ( final String id ) {
-        this.id = id;
     }
 
     /**

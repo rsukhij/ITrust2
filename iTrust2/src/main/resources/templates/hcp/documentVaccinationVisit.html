@@ -77,6 +77,7 @@
                         if (age >= 12) {
                             $scope.twelveAndUp = true;
                         }
+                 
                     }
 
                     /*Getting a list of patients*/
@@ -92,15 +93,22 @@
     						$scope.vaccines = response.data;
     						$scope.selectedVaccine = response.data[0];
     					});
-                    
-                    /* Gets number of doses in vaccine */
-                    $scope.vacc = function() {
-                    	$http.get("/iTrust2/api/v1/addVaccine")
+    				/**
+    				 * Loads the Appointment Requests from the API.
+    				 */
+    				$http.get("/iTrust2/api/v1/appointmentrequests")
     					.then(function (response) {
-    						$scope.vaccines = response.data;
-    						$scope.selectedVaccine = response.data[0];
+    						$scope.appointments = response.data;
     					});
+                    
+    				
+                    
+                    /* Gets number of doses in selected vaccine */
+                    $scope.doses = function() {
+                    	$scope.dosesNum = $scope.selectedVaccine.doseNumber;
+                    	$scope.dose = 0;
                     }
+                    
                    
 
                     /*Submit function*/
@@ -109,10 +117,6 @@
                         $scope.message = "";
                         $scope.visit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
 
-                        // Error checking
-                        if (!$scope.visit.type) {
-                            $scope.errorMsg += "Please select a visit type\n";
-                        }
 
                         // Validate date and time
                         var date = new Date($scope.visitInputDate);
@@ -135,50 +139,22 @@
                             $scope.visit.date = date.toISOString();
                         }
                         
-                        /*Submitting Vaccination Visits by type*/
-                        if ($scope.visit.type === 'GENERAL_CHECKUP' ||
-                        		$scope.visit.type === 'GENERAL_OPHTHALMOLOGY') {
-                        	
-                        	// Check if values are valid
-                        	if ($scope.visit.type == 'GENERAL_CHECKUP') {
-                        		
-                        		checkBasicHealthMetrics();
-                        		
-                        	} else if ($scope.visit.type == 'GENERAL_OPHTHALMOLOGY') {
-                        		
-                            	if (validateBasicHealthMetrics()) {
-                            		// At least one of the BHM fields were filled out
-                            		// So they all must be checked.
-                            		checkBasicHealthMetrics();
-                            	}
-                            	
-                            	checkEyeHealthMetrics();
-                            	
-                            }
-                            
-                            if ($scope.errorMsg == "") {
-                                $scope.visit.diagnoses = $scope.diagnoses;
-                                $scope.visit.prescriptions = $scope.prescriptions;
-                                $scope.visit.prescriptions.forEach(function (p) {
-                                    p.patient = $scope.visit.patient;
-                                });
+                       if ($scope.errorMsg == "") {
 
-                                $scope.visit.labProcedures = $scope.procedures;
-                                
-                                $http({
-                                    method: 'POST',
-                                    url: '/iTrust2/api/v1/vaccinationvisits',
-                                    data: $scope.visit
-                                }).then(function (response) {
-                                    $scope.errorMsg = "";
-                                    $scope.message = "Vaccination visit created successfully";
-                                }, function (rejection) {
-                                    $scope.message = "";
-                                    $scope.errorMsg = "Error occurred creating vaccination visit: " + rejection.data.message;
-                                })
-                            }
-                        }
-                         else {
+                               
+                       		$http({
+                                 method: 'POST',
+                                 url: '/iTrust2/api/v1/vaccinationvisits',
+                                 data: $scope.visit
+                             }).then(function (response) {
+                                 $scope.errorMsg = "";
+                                 $scope.message = "Vaccination visit created successfully";
+                             }, function (rejection) {
+                                 $scope.message = "";
+                                 $scope.errorMsg = "Error occurred creating vaccination visit: " + rejection.data.message;
+                             })
+                          
+                        } else {
                             $scope.message = "";
                             $scope.errorMsg = "Invalid vaccination visit type";
                         }
@@ -217,12 +193,33 @@
 											</label>
 										</div>
 									</div>
-									
-									
-									
-									
+	
 									
 								</div>
+								
+								<div class="row">
+								
+								
+									<div class="form-group">
+									<label for="vaccineType">Vaccine Type:
+										</td><select ng-model="" ng-change="dosesNum()"
+			                          ng-options="vaccine as vaccine.name for vaccine in vaccines">
+									<option value="">Select Vaccine</option>
+										</select>
+									</div>
+								
+								
+									<div class="col-md-4">
+										<label>Dose Number</label> <input type="number" 
+											class="form-control" name="doses" ng-model="dose"
+											placeholder = "Dose Number" min = "1" max= "2" required />
+									</div>
+								
+								</div>
+								
+								
+								
+								
 								<div class="row">
 									<div class="form-group col-md-4">
 										<label>Patient:</label>
@@ -245,16 +242,49 @@
 											</div>
 										</div>
 									</div>
-									<div class="form-group">
-										<label for="vaccineType">Vaccine Type:
-											</td><select ng-model="selectedVaccine"
-			                         		 ng-options="vaccine as vaccine.name for vaccine in vaccines">
-										<option value="">Select Vaccine</option>
-											</select>
+								</div>
+								
+								<div class="row">
+									<div class="form-group col-md-4">
+										<label>Appointment Request:</label>
+
+										<div class="panel panel-default">
+											<div class="panel-body">
+												<div class="form-check">
+													<ul
+														style="max-height: 15%; overflow: auto; list-style: none;">
+														<li ng-repeat="appointment in appointments | filter:searchFilter">
+															<label> <input type="radio"
+																ng-model="$parent.visit.appointment" name="name"
+																value="{{patient.date}}"
+																id="{{patient.date}}" />&nbsp;{{patient.date.toString()}}
+														</label>
+														</li>
+													</ul>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+								
+								<div class="row">
+									<div ng-show="dosesNum == 2" class="form-group">
+										<div class="form-group col-md-2">
+											<label for="date">Date:</label> <input id="date" type="date"
+												class="form-control" ng-model="followupInputDate" name="date"
+												ng-change="patientSelect(null);" required="true" />
+										</div>
+	
+										<div class="form-group col-md-2">
+											<label for="time">Time:</label> <input id="time" type="time"
+												name="time" class="form-control" ng-model="followupInputTime"
+												required="true" />
+										</div>
+									</div>
 								</div>
 									
 								
-								</div>
+								
 								<!-- Error Messages -->
 								<div class="row">
 									<div class="col-md-12 text-right">
