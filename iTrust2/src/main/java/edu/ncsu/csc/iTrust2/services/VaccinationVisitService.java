@@ -107,6 +107,7 @@ public class VaccinationVisitService <T extends OfficeVisit> extends OfficeVisit
         ov.setHospital( hospitalService.findByName( ovf.getHospital() ) );
 
         if ( ovf.getFollowUpRequested() != null && ovf.getFollowUpRequested().equals( "yes" ) ) {
+            ov.setFollowUpRequested( true );
             ov.setFollowupDate( ZonedDateTime.parse( ovf.getFollowUpDate() ) );
         }
 
