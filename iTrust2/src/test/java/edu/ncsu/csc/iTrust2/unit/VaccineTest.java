@@ -21,10 +21,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import edu.ncsu.csc.iTrust2.TestConfig;
 import edu.ncsu.csc.iTrust2.models.Vaccine;
 
-import edu.ncsu.csc.iTrust2.models.Vaccine;
-
 /**
- * @author sarasophiamasood
+ * Test Class for Vaccines.
+ *
+ * @author Sara Sophia Masood
  *
  */
 @RunWith ( SpringRunner.class )
@@ -35,7 +35,7 @@ class VaccineTest {
     private final List<Vaccine> vaccineList = new ArrayList<Vaccine>();
 
     /**
-     * Test method for {@link edu.ncsu.csc.iTrust2.models.Vaccine#hashCode()}.
+     * Test method for hashCode
      */
     @Test
     @Transactional
@@ -90,7 +90,7 @@ class VaccineTest {
     }
 
     /**
-     * Test method for {@link edu.ncsu.csc.iTrust2.models.Vaccine#Vaccine()}.
+     * Test method for Vaccine Constructor
      */
     @Test
     @Transactional
@@ -115,8 +115,7 @@ class VaccineTest {
     }
 
     /**
-     * Test method for
-     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#addVaccine(java.lang.String, int, int, int, boolean, int, boolean)}.
+     * Test method for adding a vaccine.
      */
     @Test
     @Transactional
@@ -160,8 +159,7 @@ class VaccineTest {
     }
 
     /**
-     * Test method for
-     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#editVaccine(java.lang.String, int, int, int, boolean, int, boolean)}.
+     * Test method for editing a vaccine.
      */
     @Test
     @Transactional
@@ -181,45 +179,7 @@ class VaccineTest {
     }
 
     /**
-     * Test method for
-     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#updateVaccine(java.lang.String, boolean)}.
-     */
-    @Test
-    @Transactional
-    void testUpdateVaccine () {
-        // final Vaccine v = new Vaccine();
-        // v.setName( "Pfizer" );
-        // v.setAgeMax( 25 );
-        // v.setAgeMin( 20 );
-        // v.setDoseNumber( 1 );
-        // v.setIfSecondDose( false );
-        // v.setDaysBetween( 0 );
-        // v.setIfAvailable( false );
-        //
-        // vaccineList.add( v );
-        // assertEquals( vaccineList.size(), 1 );
-        // v.updateVaccine( "Pfizer", true );
-        // assertEquals( v.getIfAvailable(), true );
-        //
-        // final Vaccine v2 = new Vaccine();
-        // v2.setName( "Moderna" );
-        // v2.setAgeMax( 35 );
-        // v2.setAgeMin( 30 );
-        // v2.setDoseNumber( 2 );
-        // v2.setIfSecondDose( false );
-        // v2.setDaysBetween( 2 );
-        // v2.setIfAvailable( true );
-        //
-        // vaccineList.add( v2 );
-        // assertEquals( vaccineList.size(), 2 );
-        // v2.updateVaccine( "Moderna", false );
-        // assertEquals( v2.getIfAvailable(), false );
-
-    }
-
-    /**
-     * Test method for
-     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#listVaccinesAvailable()}.
+     * Test method for listing the available vaccines.
      */
     @Test
     @Transactional
@@ -261,8 +221,7 @@ class VaccineTest {
     }
 
     /**
-     * Test method for
-     * {@link edu.ncsu.csc.iTrust2.models.Vaccine#equals(java.lang.Object)}.
+     * Test method for equals
      */
     @Test
     @Transactional
@@ -309,7 +268,7 @@ class VaccineTest {
     }
 
     /**
-     * Test method for {@link edu.ncsu.csc.iTrust2.models.Vaccine#toString()}.
+     * Test method for toString
      */
     @Test
     @Transactional

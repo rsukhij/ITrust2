@@ -15,17 +15,39 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.services.VaccineService;
 
+/**
+ * APIVaccineController Class that extends APIController. Has methods for
+ * getting the Vaccine, adding a Vaccine and editing a Vaccine.
+ *
+ * @author Sara Sophia Masood
+ *
+ */
 @RestController
 public class APIVaccineController extends APIController {
 
+    /*
+     * Vaccine service
+     */
     @Autowired
     private VaccineService service;
 
+    /**
+     * Retrieves list of vaccines in database.
+     *
+     * @return list of vaccines
+     */
     @GetMapping ( BASE_PATH + "/addVaccine" )
     public List<Vaccine> getVaccines () {
         return service.findAll();
     }
 
+    /**
+     * Adds vaccine to database.
+     *
+     * @param vaccine
+     *            vaccine
+     * @return response
+     */
     @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @PostMapping ( BASE_PATH + "/addVaccine" )
@@ -48,6 +70,13 @@ public class APIVaccineController extends APIController {
         }
     }
 
+    /**
+     * Edits vaccine in database
+     *
+     * @param v
+     *            vaccine
+     * @return response
+     */
     @PreAuthorize ( "hasRole('ROLE_ADMIN')" )
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @PutMapping ( BASE_PATH + "/addVaccine" )

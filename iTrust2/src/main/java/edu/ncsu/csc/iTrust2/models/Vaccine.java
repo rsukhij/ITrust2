@@ -8,8 +8,17 @@ import java.util.Objects;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
+// import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
 
+/**
+ * Vaccine Class that extends the DomainObject Class. Has instance variables for
+ * ageMin and ageMax, as well as dose number, ifSecondDose, daysBetween, and
+ * ifAvailable. This class is used by authenticated administrators only, and
+ * includes the information they are inputting for a patient.
+ *
+ * @author Sara Sophia Masood
+ *
+ */
 @Entity
 public class Vaccine extends DomainObject {
 
@@ -91,6 +100,25 @@ public class Vaccine extends DomainObject {
         this.ifAvailable = ifAvailable;
     }
 
+    /**
+     * Edit vaccine method. This enables the administrator to go back to the
+     * saved vaccine and further edit it.
+     *
+     * @param name
+     *            vaccine name
+     * @param ageMin
+     *            approved vaccine age minimum
+     * @param ageMax
+     *            approved vaccine age maximum
+     * @param doseNumber
+     *            what dose of the vaccine the patient is recieving
+     * @param ifSecondDose
+     *            if this is the seond dos of the vaccine
+     * @param daysBetween
+     *            days
+     * @param ifAvailable
+     *            if the vaccine is currently available
+     */
     public void editVaccine ( final String name, final int ageMin, final int ageMax, final int doseNumber,
             final boolean ifSecondDose, final int daysBetween, final boolean ifAvailable ) {
 
@@ -104,11 +132,17 @@ public class Vaccine extends DomainObject {
 
     }
 
+    /**
+     * Hashcode method.
+     */
     @Override
     public int hashCode () {
         return Objects.hash( ageMax, ageMin, daysBetween, doseNumber, ifAvailable, ifSecondDose, name );
     }
 
+    /**
+     * Equals object.
+     */
     @Override
     public boolean equals ( final Object obj ) {
         if ( this == obj ) {
@@ -126,6 +160,13 @@ public class Vaccine extends DomainObject {
                 && ifSecondDose == other.ifSecondDose && Objects.equals( name, other.name );
     }
 
+    /**
+     * Method to check id the patient is eligible for receiving the vaccines
+     *
+     * @param patient
+     *            being treated
+     * @return true if patient is eligible
+     */
     public boolean isEligible ( final Patient patient ) {
         final long daysAfterBirth = Duration
                 .between( patient.getDateOfBirth().atStartOfDay(), LocalDate.now().atStartOfDay() ).toDays();
@@ -133,12 +174,18 @@ public class Vaccine extends DomainObject {
         if ( approxAge < ageMin || approxAge > ageMax ) {
             return false;
         }
-        if ( patient.getVaccinationStatus() == PatientVaccinationStatus.FULLY_VACCINATED ) {
-            return false;
-        }
+        // if ( patient.getVaccinationStatus() ==
+        // PatientVaccinationStatus.FULLY_VACCINATED ) {
+        // return false;
+        // }
         return true;
     }
 
+    /**
+     * To String method
+     *
+     * @return String of vaccine information
+     */
     @Override
     public String toString () {
         return "Vaccine [name=" + name + ", ageMin=" + ageMin + ", ageMax=" + ageMax + ", doseNumber=" + doseNumber
@@ -146,6 +193,9 @@ public class Vaccine extends DomainObject {
                 + "]";
     }
 
+    /**
+     * GetId method.
+     */
     @Override
     public Serializable getId () {
         // TODO Auto-generated method stub
