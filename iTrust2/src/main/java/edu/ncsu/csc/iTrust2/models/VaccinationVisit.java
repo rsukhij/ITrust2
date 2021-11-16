@@ -2,26 +2,13 @@ package edu.ncsu.csc.iTrust2.models;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZonedDateTime;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Convert;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.google.gson.annotations.JsonAdapter;
-
-import edu.ncsu.csc.iTrust2.adapters.ZonedDateTimeAdapter;
-import edu.ncsu.csc.iTrust2.adapters.ZonedDateTimeAttributeConverter;
 import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
 
 /**
@@ -57,28 +44,9 @@ public class VaccinationVisit extends OfficeVisit {
     @JoinColumn ( name = "vaccinator_id", columnDefinition = "varchar(100)" )
     private User                          vaccinator;
 
-    /**
-     * The date of this vaccination visit
-     */
     @NotNull
-    @Basic
-    // Allows the field to show up nicely in the database
-    @Convert ( converter = ZonedDateTimeAttributeConverter.class )
-    @JsonAdapter ( ZonedDateTimeAdapter.class )
-    private ZonedDateTime                 date;
-
-    /**
-     * The id of this vaccination visit
-     */
-    @Id
-    @GeneratedValue ( strategy = GenerationType.AUTO )
-    private Long                          id;
-
-    /**
-     * Prescriptions associated with this OfficeVisit
-     */
-    @OneToMany ( cascade = CascadeType.ALL )
-    @JsonManagedReference
+    @ManyToOne
+    @JoinColumn ( name = "vaccine_name", columnDefinition = "varchar(100)" )
     private Vaccine                       vaccine;
 
     /**
@@ -92,11 +60,6 @@ public class VaccinationVisit extends OfficeVisit {
     @OneToOne
     @JoinColumn ( name = "appointment_id" )
     private VaccinationAppointmentRequest appointment;
-
-    /**
-     * Office Visit
-     */
-    OfficeVisit                           ov = new OfficeVisit();
 
     /** For Hibernate/Thymeleaf _must_ be an empty constructor */
     public VaccinationVisit () {
@@ -148,40 +111,6 @@ public class VaccinationVisit extends OfficeVisit {
      */
     public void setVaccinator ( final User vaccinator ) {
         this.vaccinator = vaccinator;
-    }
-
-    /**
-     * @return the date
-     */
-    @Override
-    public ZonedDateTime getDate () {
-        return date;
-    }
-
-    /**
-     * @param date
-     *            the date to set
-     */
-    @Override
-    public void setDate ( final ZonedDateTime date ) {
-        this.date = date;
-    }
-
-    /**
-     * @return the id
-     */
-    @Override
-    public Long getId () {
-        return id;
-    }
-
-    /**
-     * @param id
-     *            the id to set
-     */
-    @Override
-    public void setId ( final Long id ) {
-        this.id = id;
     }
 
     /**
@@ -244,8 +173,8 @@ public class VaccinationVisit extends OfficeVisit {
      * vaccine they are receiving
      */
     public void validateAge () {
-        final Patient p = (Patient) ov.getPatient();
-        final LocalDate appointmentDate = date.toLocalDate();
+        final Patient p = (Patient) super.getPatient();
+        final LocalDate appointmentDate = super.getDate().toLocalDate();
         final Period period = Period.between( p.getDateOfBirth(), appointmentDate );
         final int age = period.getYears();
 
@@ -259,9 +188,9 @@ public class VaccinationVisit extends OfficeVisit {
      * documenting an initial visit, there will be an error
      */
     public void validateVisitNumber () {
-        final Patient p = (Patient) ov.getPatient();
+        final Patient p = (Patient) super.getPatient();
         if ( vaccine.getIfSecondDose() ) {
-            if ( p.getVaccinationStatus().equals( 0 ) && visitNumber == 2 ) {
+            if ( p.getVaccinationStatus().equals( PatientVaccinationStatus.NO_VACCINATION ) && visitNumber == 2 ) {
                 throw new IllegalArgumentException(
                         "Can't document a second appointment if there has not been a previous one." );
             }
@@ -272,7 +201,7 @@ public class VaccinationVisit extends OfficeVisit {
      * Updates the vaccination status based on a change in visitNumber
      */
     public void updatePatientVaccinationStatus () {
-        final Patient p = (Patient) ov.getPatient();
+        final Patient p = (Patient) super.getPatient();
         if ( !vaccine.ifSecondDose && visitNumber == 1 || vaccine.ifSecondDose && visitNumber == 2 ) {
             p.setVaccinationStatus( PatientVaccinationStatus.FULLY_VACCINATED );
         }

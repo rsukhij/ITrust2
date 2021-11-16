@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.ncsu.csc.iTrust2.models.OfficeVisit;
+import edu.ncsu.csc.iTrust2.forms.VaccinationVisitForm;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
 import edu.ncsu.csc.iTrust2.models.enums.TransactionType;
@@ -58,7 +58,7 @@ public class APIVaccinationVisitController extends APIController {
     public List<VaccinationVisit> getVaccinationVisitsForHCP () {
         final User self = userService.findByName( LoggerUtil.currentUser() );
         loggerUtil.log( TransactionType.VIEW_ALL_VACCINATION_VISITS, self );
-        final List<OfficeVisit> visits = vaccinationVisitService.findByHcp( self );
+        final List<VaccinationVisit> visits = vaccinationVisitService.findByHcp( self );
         return visits;
     }
 
@@ -66,9 +66,9 @@ public class APIVaccinationVisitController extends APIController {
      * Retrieves a list of all VaccinationVisits in the database for the current
      * patient
      *
-     * @return list of office visits
+     * @return list of vaccination visits
      */
-    @GetMapping ( BASE_PATH + "/officevisits/myofficevisits" )
+    @GetMapping ( BASE_PATH + "/vaccinationvisits/myvaccinationvisits" )
     @PreAuthorize ( "hasAnyRole('ROLE_PATIENT')" )
     public List<VaccinationVisit> getMyVaccinationVisits () {
         final User self = userService.findByName( LoggerUtil.currentUser() );
@@ -88,7 +88,7 @@ public class APIVaccinationVisitController extends APIController {
     public ResponseEntity getVaccinationVisit ( @PathVariable final Long id ) {
         final User self = userService.findByName( LoggerUtil.currentUser() );
         loggerUtil.log( TransactionType.GENERAL_CHECKUP_HCP_VIEW, self );
-        if ( !vacciantionVisitService.existsById( id ) ) {
+        if ( !vaccinationVisitService.existsById( id ) ) {
             return new ResponseEntity( HttpStatus.NOT_FOUND );
         }
 
@@ -113,7 +113,7 @@ public class APIVaccinationVisitController extends APIController {
                         errorResponse( "Vaccination visit with the id " + visit.getId() + " already exists" ),
                         HttpStatus.CONFLICT );
             }
-            VaccinationVisitService.save( visit );
+            vaccinationVisitService.save( visit );
             loggerUtil.log( TransactionType.GENERAL_CHECKUP_CREATE, LoggerUtil.currentUser(),
                     visit.getPatient().getUsername() );
             return new ResponseEntity( visit, HttpStatus.OK );

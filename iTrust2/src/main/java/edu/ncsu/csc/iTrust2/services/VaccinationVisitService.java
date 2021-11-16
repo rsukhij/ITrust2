@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
-import edu.ncsu.csc.iTrust2.forms.OfficeVisitForm;
+import edu.ncsu.csc.iTrust2.forms.VaccinationVisitForm;
 import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.User;
@@ -90,27 +90,26 @@ public class VaccinationVisitService extends Service<VaccinationVisit, Long> {
     /**
      * Builds an VaccinatoinVisit based on the deserialised VaccinationVisitForm
      *
-     * @param ovf
+     * @param visitForm
      *            Form to build from
      * @return Constructed VaccinationVisit
      */
-    public VaccinationVisit build ( final OfficeVisitForm ovf ) {
+    public VaccinationVisit build ( final VaccinationVisitForm visitForm ) {
         final VaccinationVisit ov = new VaccinationVisit();
 
-        ov.setPatient( userService.findByName( ovf.getPatient() ) );
-        ov.setHcp( userService.findByName( ovf.getHcp() ) );
-        ov.setNotes( ovf.getNotes() );
+        ov.setPatient( userService.findByName( visitForm.getPatient() ) );
+        ov.setHcp( userService.findByName( visitForm.getHcp() ) );
 
-        if ( ovf.getId() != null ) {
-            ov.setId( Long.parseLong( ovf.getId() ) );
+        if ( visitForm.getId() != null ) {
+            ov.setId( Long.parseLong( visitForm.getId() ) );
         }
 
-        final ZonedDateTime visitDate = ZonedDateTime.parse( ovf.getDate() );
+        final ZonedDateTime visitDate = ZonedDateTime.parse( visitForm.getDate() );
         ov.setDate( visitDate );
 
         AppointmentType at = null;
         try {
-            at = AppointmentType.valueOf( ovf.getType() );
+            at = AppointmentType.valueOf( visitForm.getType() );
         }
         catch ( final NullPointerException npe ) {
             at = AppointmentType.VACCINATION; /*
@@ -121,7 +120,7 @@ public class VaccinationVisitService extends Service<VaccinationVisit, Long> {
         }
         ov.setType( at );
 
-        if ( null != ovf.getPreScheduled() ) {
+        if ( null != visitForm.getPreScheduled() ) {
             final List<AppointmentRequest> requests = appointmentRequestService.findByHcpAndPatient( ov.getHcp(),
                     ov.getPatient() );
             try {
