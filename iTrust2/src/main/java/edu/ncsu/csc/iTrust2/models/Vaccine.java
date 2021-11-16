@@ -14,7 +14,7 @@ import javax.persistence.Id;
  * Vaccine Class that extends the DomainObject Class. Has instance variables for
  * ageMin and ageMax, as well as dose number, ifSecondDose, daysBetween, and
  * ifAvailable. This class is used by authenticated administrators only, and
- * includes the information they are inputting for a patient.
+ * includes the information they are inputting for a vaccine.
  *
  * @author Sara Sophia Masood
  *
@@ -22,17 +22,28 @@ import javax.persistence.Id;
 @Entity
 public class Vaccine extends DomainObject {
 
+    /**
+     * Name of Vaccine
+     */
     @Id
     String  name;
 
+    /** Approved Vaccine age minimum */
     int     ageMin;
+    /** Approved Vaccine age maximum */
     int     ageMax;
-    // String ageRange;
+    /** Dose of the vaccine the patient is recieving(either first or second) */
     int     doseNumber;
+    /** If this is the second dose of the vaccine */
     boolean ifSecondDose;
+    /** Number of days between vaccination dates */
     int     daysBetween;
+    /** If the vaccine is currently available */
     boolean ifAvailable;
 
+    /**
+     * Constructor for Vaccine class.
+     */
     public Vaccine () {
         setName( name );
         setAgeMin( ageMin );
@@ -44,58 +55,137 @@ public class Vaccine extends DomainObject {
         // vaccineList = new ArrayList<Vaccine>();
     }
 
+    /**
+     * Getter method for vaccineName
+     *
+     * @return name vaccine name
+     */
     public String getName () {
         return name;
     }
 
+    /**
+     * Setter method for vaccineName
+     *
+     * @param name
+     *            vaccine name
+     */
     public void setName ( final String name ) {
         this.name = name;
     }
 
+    /**
+     * Getter method for ageMin
+     *
+     * @return ageMin approved vaccine age minimum
+     */
     public int getAgeMin () {
         return ageMin;
     }
 
+    /**
+     * Setter method for ageMin
+     *
+     * @param ageMin
+     *            approved vaccine age minimum
+     */
     public void setAgeMin ( final int ageMin ) {
         this.ageMin = ageMin;
     }
 
+    /**
+     * Getter method for ageMax
+     *
+     * @return ageMax approved vaccine age maximum
+     */
     public int getAgeMax () {
         return ageMax;
     }
 
+    /**
+     * Setter method for ageMax
+     *
+     * @param ageMax
+     *            approved vaccine age maximum
+     */
     public void setAgeMax ( final int ageMax ) {
         this.ageMax = ageMax;
     }
 
+    /**
+     * Getter method for doseNumber
+     *
+     * @return doseNumber what dose of the vaccine the patient is
+     *         recieving(either first or second)
+     */
     public int getDoseNumber () {
         return doseNumber;
     }
 
+    /**
+     * Setter method for doseNumber
+     *
+     * @param doseNumber
+     *            what dose of the vaccine the patient is recieving(either first
+     *            or second)
+     */
     public void setDoseNumber ( final int doseNumber ) {
         this.doseNumber = doseNumber;
     }
 
+    /**
+     * Getter method for secondDose
+     *
+     * @return ifSecondDose if this is the second dose of the vaccine
+     */
     public boolean getIfSecondDose () {
         return ifSecondDose;
     }
 
+    /**
+     * Setter method for secondDose
+     *
+     * @param ifSecondDose
+     *            if this is the second dose of the vaccine
+     */
     public void setIfSecondDose ( final boolean ifSecondDose ) {
         this.ifSecondDose = ifSecondDose;
     }
 
+    /**
+     * Getter method for daysBetween
+     *
+     * @return daysBetween number of days between vaccination dates
+     */
     public int getDaysBetween () {
         return daysBetween;
     }
 
+    /**
+     * Setter method for daysBetween
+     *
+     * @param daysBetween
+     *            number of days between vaccination dates
+     */
     public void setDaysBetween ( final int daysBetween ) {
         this.daysBetween = daysBetween;
     }
 
+    /**
+     * Getter method for ifAvailable
+     *
+     * @return ifAvailable if vaccine is currently available
+     */
     public boolean getIfAvailable () {
         return ifAvailable;
     }
 
+    /**
+     * Setter method for ifAvailable
+     *
+     * @param ifAvailable
+     *            if vaccine is currently available
+     */
     public void setIfAvailable ( final boolean ifAvailable ) {
         this.ifAvailable = ifAvailable;
     }
@@ -111,11 +201,12 @@ public class Vaccine extends DomainObject {
      * @param ageMax
      *            approved vaccine age maximum
      * @param doseNumber
-     *            what dose of the vaccine the patient is recieving
+     *            what dose of the vaccine the patient is recieving(either first
+     *            or second)
      * @param ifSecondDose
-     *            if this is the seond dos of the vaccine
+     *            if this is the second dose of the vaccine
      * @param daysBetween
-     *            days
+     *            number of days between vaccination dates
      * @param ifAvailable
      *            if the vaccine is currently available
      */
@@ -161,7 +252,7 @@ public class Vaccine extends DomainObject {
     }
 
     /**
-     * Method to check id the patient is eligible for receiving the vaccines
+     * Method to check id the patient is eligible for receiving a vaccine
      *
      * @param patient
      *            being treated
@@ -182,7 +273,7 @@ public class Vaccine extends DomainObject {
     }
 
     /**
-     * To String method
+     * ToString method that returns a string of the vaccine information.
      *
      * @return String of vaccine information
      */
