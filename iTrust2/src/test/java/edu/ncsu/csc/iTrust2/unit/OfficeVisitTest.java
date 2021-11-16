@@ -53,25 +53,25 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 public class OfficeVisitTest {
 
     @Autowired
-    private OfficeVisitService        officeVisitService;
+    private OfficeVisitService<OfficeVisit> officeVisitService;
 
     @Autowired
-    private BasicHealthMetricsService basicHealthMetricsService;
+    private BasicHealthMetricsService       basicHealthMetricsService;
 
     @Autowired
-    private HospitalService           hospitalService;
+    private HospitalService                 hospitalService;
 
     @Autowired
-    private UserService               userService;
+    private UserService                     userService;
 
     @Autowired
-    private ICDCodeService            icdCodeService;
+    private ICDCodeService                  icdCodeService;
 
     @Autowired
-    private DrugService               drugService;
+    private DrugService                     drugService;
 
     @Autowired
-    private PrescriptionService       prescriptionService;
+    private PrescriptionService             prescriptionService;
 
     @Before
     public void setup () {

@@ -26,6 +26,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -33,12 +34,14 @@ import edu.ncsu.csc.iTrust2.common.TestUtils;
 import edu.ncsu.csc.iTrust2.forms.AppointmentRequestForm;
 import edu.ncsu.csc.iTrust2.forms.OfficeVisitForm;
 import edu.ncsu.csc.iTrust2.forms.UserForm;
+import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.BasicHealthMetrics;
 import edu.ncsu.csc.iTrust2.models.Hospital;
 import edu.ncsu.csc.iTrust2.models.OfficeVisit;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.Personnel;
 import edu.ncsu.csc.iTrust2.models.User;
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
 import edu.ncsu.csc.iTrust2.models.enums.BloodType;
 import edu.ncsu.csc.iTrust2.models.enums.Ethnicity;
@@ -53,6 +56,7 @@ import edu.ncsu.csc.iTrust2.services.BasicHealthMetricsService;
 import edu.ncsu.csc.iTrust2.services.HospitalService;
 import edu.ncsu.csc.iTrust2.services.OfficeVisitService;
 import edu.ncsu.csc.iTrust2.services.UserService;
+import edu.ncsu.csc.iTrust2.services.VaccineService;
 
 /**
  * Test for the API functionality for interacting with office visits
@@ -65,25 +69,28 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 @AutoConfigureMockMvc
 public class APIOfficeVisitTest {
 
-    private MockMvc                   mvc;
+    private MockMvc                         mvc;
 
     @Autowired
-    private WebApplicationContext     context;
+    private WebApplicationContext           context;
 
     @Autowired
-    private OfficeVisitService        officeVisitService;
+    private OfficeVisitService<OfficeVisit> officeVisitService;
 
     @Autowired
-    private UserService               userService;
+    private UserService                     userService;
 
     @Autowired
-    private AppointmentRequestService appointmentRequestService;
+    private AppointmentRequestService       appointmentRequestService;
 
     @Autowired
-    private HospitalService           hospitalService;
+    private HospitalService                 hospitalService;
 
     @Autowired
-    private BasicHealthMetricsService bhmService;
+    private BasicHealthMetricsService       bhmService;
+
+    @Autowired
+    private VaccineService                  vaccService;
 
     /**
      * Sets up test
@@ -111,6 +118,68 @@ public class APIOfficeVisitTest {
         hosp.setName( "iTrust Test Hospital 2" );
 
         hospitalService.save( hosp );
+
+    }
+
+    /**
+     * Tests OfficeVisitAPI
+     *
+     * @throws Exception
+     */
+    @Test
+    @Transactional
+    @WithMockUser ( username = "hcp", roles = { "HCP" } )
+    public void testVaccinationVisitAPI () throws Exception {
+        final AppointmentRequestForm appointmentForm = new AppointmentRequestForm();
+        final User patient = userService.findByName( "patient" );
+        ( (Patient) patient ).setDateOfBirth( LocalDate.of( 2005, 5, 25 ) );
+
+        final Vaccine v4 = new Vaccine();
+        v4.setName( "Pfizer" );
+        v4.setAgeMax( 70 );
+        v4.setAgeMin( 12 );
+        v4.setDoseNumber( 1 );
+        v4.setIfSecondDose( false );
+        v4.setDaysBetween( 0 );
+        v4.setIfAvailable( true );
+        vaccService.save( v4 );
+
+        // 2030-11-19 4:50 AM EST
+        appointmentForm.setDate( "2030-11-19T04:50:00.000-05:00" );
+
+        appointmentForm.setType( "VACCINATION" );
+        appointmentForm.setHcp( "hcp" );
+        appointmentForm.setPatient( "patient" );
+        appointmentForm.setComments( "Test appointment please ignore" );
+        appointmentForm.setVaccineType( "Pfizer" );
+        final AppointmentRequest req = appointmentRequestService.build( appointmentForm );
+        req.setStatus( Status.APPROVED );
+        appointmentRequestService.save( req );
+        final OfficeVisitForm visit = new OfficeVisitForm();
+        visit.setPreScheduled( "yes" );
+        visit.setDate( "2030-11-19T04:50:00.000-05:00" );
+        visit.setHcp( "hcp" );
+        visit.setPatient( "patient" );
+        visit.setNotes( "Test office visit" );
+        visit.setType( AppointmentType.VACCINATION.toString() );
+        visit.setHospital( "iTrust Test Hospital 2" );
+        visit.setVaccine( "Pfizer" );
+
+        final MvcResult result = mvc.perform( post( "/api/v1/vaccinationvisits" )
+                .contentType( MediaType.APPLICATION_JSON ).content( TestUtils.asJsonString( visit ) ) ).andReturn();
+
+        Assert.assertEquals( 1, officeVisitService.count() );
+
+        officeVisitService.deleteAll();
+
+        Assert.assertEquals( 0, officeVisitService.count() );
+
+        visit.setDate( "2030-12-19T04:50:00.000-05:00" );
+        // setting a pre-scheduled appointment that doesn't match should not
+        // work.
+        mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isBadRequest() );
+
     }
 
     private Patient buildPatient () {
@@ -180,8 +249,8 @@ public class APIOfficeVisitTest {
         visit.setType( AppointmentType.GENERAL_CHECKUP.toString() );
         visit.setHospital( "iTrust Test Hospital 2" );
 
-        mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
-                .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
+        final MvcResult result = mvc.perform( post( "/api/v1/officevisits" ).contentType( MediaType.APPLICATION_JSON )
+                .content( TestUtils.asJsonString( visit ) ) ).andReturn();
 
         Assert.assertEquals( 1, officeVisitService.count() );
 

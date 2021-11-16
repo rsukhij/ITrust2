@@ -37,19 +37,19 @@ public class APIDiagnosisController extends APIController {
      * LoggerUtil
      */
     @Autowired
-    private LoggerUtil         loggerUtil;
+    private LoggerUtil                      loggerUtil;
 
     /** Diagnosis Service */
     @Autowired
-    private DiagnosisService   diagnosisService;
+    private DiagnosisService                diagnosisService;
 
     /** OfficeVisit service */
     @Autowired
-    private OfficeVisitService officeVisitService;
+    private OfficeVisitService<OfficeVisit> officeVisitService;
 
     /** User service */
     @Autowired
-    private UserService<User>  userService;
+    private UserService<User>               userService;
 
     /**
      * Returns the Diagnosis with the specified ID.

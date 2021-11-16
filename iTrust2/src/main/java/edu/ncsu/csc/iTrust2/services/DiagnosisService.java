@@ -28,15 +28,15 @@ public class DiagnosisService extends Service<Diagnosis, Long> {
 
     /** Repository for CRUD tasks */
     @Autowired
-    private DiagnosisRepository repository;
+    private DiagnosisRepository             repository;
 
     /** Office visit service for lookups */
     @Autowired
-    private OfficeVisitService  service;
+    private OfficeVisitService<OfficeVisit> service;
 
     /** ICDCode service for lookups */
     @Autowired
-    private ICDCodeService      icdCodeService;
+    private ICDCodeService                  icdCodeService;
 
     @Override
     protected JpaRepository<Diagnosis, Long> getRepository () {
@@ -62,7 +62,7 @@ public class DiagnosisService extends Service<Diagnosis, Long> {
 
     /**
      * Finds all Diagnoses for a specified patient
-     * 
+     *
      * @param patient
      *            Patient to search for
      * @return Diagnoses matched
@@ -75,7 +75,7 @@ public class DiagnosisService extends Service<Diagnosis, Long> {
 
     /**
      * Finds all Diagnoses for a specified OfficeVisit
-     * 
+     *
      * @param visit
      *            OfficeVisit to search by
      * @return Diagnoses matched

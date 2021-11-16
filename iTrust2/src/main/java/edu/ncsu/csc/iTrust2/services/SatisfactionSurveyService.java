@@ -28,11 +28,11 @@ public class SatisfactionSurveyService extends Service<SatisfactionSurvey, Long>
 
     /** Repository for CRUD operations */
     @Autowired
-    private SatisfactionSurveyRepository repository;
+    private SatisfactionSurveyRepository       repository;
 
     /** OfficeVisit repository */
     @Autowired
-    private OfficeVisitRepository        officeVisitRepository;
+    private OfficeVisitRepository<OfficeVisit> officeVisitRepository;
 
     @Override
     protected JpaRepository<SatisfactionSurvey, Long> getRepository () {

@@ -4,13 +4,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
+import javax.transaction.Transactional;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -57,31 +59,31 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 public class SatisfactionSurveyTest {
 
     @Autowired
-    private OfficeVisitService        officeVisitService;
+    private OfficeVisitService<OfficeVisit>     officeVisitService;
 
     @Autowired
-    private BasicHealthMetricsService basicHealthMetricsService;
+    private BasicHealthMetricsService           basicHealthMetricsService;
 
     @Autowired
-    private OphthalmologyMetricsService ophthalmologyMetricsService;
+    private OphthalmologyMetricsService         ophthalmologyMetricsService;
 
     @Autowired
-    private HospitalService           hospitalService;
+    private HospitalService                     hospitalService;
 
     @Autowired
-    private UserService               userService;
+    private UserService                         userService;
 
     @Autowired
-    private ICDCodeService            icdCodeService;
+    private ICDCodeService                      icdCodeService;
 
     @Autowired
-    private DrugService               drugService;
+    private DrugService                         drugService;
 
     @Autowired
-    private PrescriptionService       prescriptionService;
+    private PrescriptionService                 prescriptionService;
 
     @Autowired
-    private SatisfactionSurveyService satisfactionSurveyService;
+    private SatisfactionSurveyService           satisfactionSurveyService;
 
     @Autowired
     private SatisfactionSurveyStatisticsService satisfactionSurveyStatisticsService;
@@ -130,7 +132,7 @@ public class SatisfactionSurveyTest {
         om.setVisualAcuityLeft( 20 );
         om.setVisualAcuityRight( 20 );
 
-        ophthalmologyMetricsService.save(om);
+        ophthalmologyMetricsService.save( om );
         visit.setOphthalmologyMetrics( om );
 
         visit.setBasicHealthMetrics( bhm );
@@ -146,7 +148,7 @@ public class SatisfactionSurveyTest {
         final ICDCode code = new ICDCode();
         code.setCode( "O21" );
         code.setDescription( "Cataracts" );
-        code.setIsOphthalmology(true);
+        code.setIsOphthalmology( true );
 
         icdCodeService.save( code );
 
@@ -191,42 +193,41 @@ public class SatisfactionSurveyTest {
 
         OfficeVisit retrieved = officeVisitService.findAll().get( 0 );
 
-        assertNull(retrieved.getSatisfactionSurvey());
+        assertNull( retrieved.getSatisfactionSurvey() );
 
+        final SatisfactionSurveyForm surveyForm = new SatisfactionSurveyForm();
+        surveyForm.setOfficeVisitId( retrieved.getId() );
+        surveyForm.setVisitSatisfaction( 4 );
+        surveyForm.setTreatmentSatisfaction( 3 );
+        surveyForm.setExaminationResponseTime( WaitTime.FIFTEEN_TO_TWENTY );
+        surveyForm.setWaitingRoomTime( WaitTime.FIVE_TO_TEN );
+        surveyForm.setComments( "It was very good" );
 
-        SatisfactionSurveyForm surveyForm = new SatisfactionSurveyForm();
-        surveyForm.setOfficeVisitId(retrieved.getId());
-        surveyForm.setVisitSatisfaction(4);
-        surveyForm.setTreatmentSatisfaction(3);
-        surveyForm.setExaminationResponseTime(WaitTime.FIFTEEN_TO_TWENTY);
-        surveyForm.setWaitingRoomTime(WaitTime.FIVE_TO_TEN);
-        surveyForm.setComments("It was very good");
+        final SatisfactionSurvey survey = satisfactionSurveyService.build( surveyForm );
+        satisfactionSurveyService.save( survey );
+        assertNotNull( survey.getId() );
+        assertEquals( 1, satisfactionSurveyService.findAll().size() );
 
-        SatisfactionSurvey survey = satisfactionSurveyService.build(surveyForm);
-        satisfactionSurveyService.save(survey);
-        assertNotNull(survey.getId());
-        assertEquals(1, satisfactionSurveyService.findAll().size());
-
-        retrieved.setSatisfactionSurvey(survey);
-        officeVisitService.save(retrieved);
+        retrieved.setSatisfactionSurvey( survey );
+        officeVisitService.save( retrieved );
 
         retrieved = officeVisitService.findAll().get( 0 );
-        assertNotNull(retrieved.getSatisfactionSurvey());
+        assertNotNull( retrieved.getSatisfactionSurvey() );
 
-        SatisfactionSurveyStatistics statisticsHcp = satisfactionSurveyStatisticsService.findForHcp(visit.getHcp());
-        assertNotNull(statisticsHcp);
+        final SatisfactionSurveyStatistics statisticsHcp = satisfactionSurveyStatisticsService
+                .findForHcp( visit.getHcp() );
+        assertNotNull( statisticsHcp );
 
-        assertEquals(visit.getHcp().getUsername(), statisticsHcp.getHcp().getUsername());
-        assertEquals(4, statisticsHcp.getAverageVisitSatisfaction().intValue());
-        assertEquals(3, statisticsHcp.getAverageTreatmentSatisfaction().intValue());
-        assertEquals(WaitTime.FIVE_TO_TEN, statisticsHcp.getAverageWaitingRoomTime());
-        assertEquals(WaitTime.FIFTEEN_TO_TWENTY, statisticsHcp.getAverageExaminationResponseTime());
+        assertEquals( visit.getHcp().getUsername(), statisticsHcp.getHcp().getUsername() );
+        assertEquals( 4, statisticsHcp.getAverageVisitSatisfaction().intValue() );
+        assertEquals( 3, statisticsHcp.getAverageTreatmentSatisfaction().intValue() );
+        assertEquals( WaitTime.FIVE_TO_TEN, statisticsHcp.getAverageWaitingRoomTime() );
+        assertEquals( WaitTime.FIFTEEN_TO_TWENTY, statisticsHcp.getAverageExaminationResponseTime() );
 
-        assertNotNull(statisticsHcp.getNotes());
-        assertEquals(1, statisticsHcp.getNotes().size());
-        assertEquals("It was very good", statisticsHcp.getNotes().get(0).getComments());
-        assertEquals(3, statisticsHcp.getNotes().get(0).getAverageSatisfaction().intValue());
-
+        assertNotNull( statisticsHcp.getNotes() );
+        assertEquals( 1, statisticsHcp.getNotes().size() );
+        assertEquals( "It was very good", statisticsHcp.getNotes().get( 0 ).getComments() );
+        assertEquals( 3, statisticsHcp.getNotes().get( 0 ).getAverageSatisfaction().intValue() );
 
     }
 

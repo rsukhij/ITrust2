@@ -149,6 +149,46 @@ public class OfficeVisitForm implements Serializable {
     private OphthalmologyVisitForm ophthalmologyVisitForm;
 
     /**
+     * The vaccine requested
+     */
+    private String                 vaccine;
+
+    /**
+     * Whether a followup vaccine was requested
+     */
+    private String                 followUpRequested;
+
+    /**
+     * The followup date requested
+     *
+     */
+    private String                 followUpDate;
+
+    public String getVaccine () {
+        return vaccine;
+    }
+
+    public void setVaccine ( final String vaccine ) {
+        this.vaccine = vaccine;
+    }
+
+    public String getFollowUpRequested () {
+        return followUpRequested;
+    }
+
+    public void setFollowUpRequested ( final String followUpRequested ) {
+        this.followUpRequested = followUpRequested;
+    }
+
+    public String getFollowUpDate () {
+        return followUpDate;
+    }
+
+    public void setFollowUpDate ( final String followUpDate ) {
+        this.followUpDate = followUpDate;
+    }
+
+    /**
      * Creates an OfficeVisitForm from the OfficeVisit provided
      *
      * @param ov

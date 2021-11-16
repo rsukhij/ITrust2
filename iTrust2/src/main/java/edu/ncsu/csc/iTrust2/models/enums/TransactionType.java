@@ -561,7 +561,12 @@ public enum TransactionType {
     /**
      * When an HTTP request got intercepted, generic transaction type.
      */
-    HTTP_REQUEST ( 9001, "HTTP Request was intercepted on the system", false );
+    HTTP_REQUEST ( 9001, "HTTP Request was intercepted on the system", false ),
+
+    /**
+     * Create vaccination visit
+     */
+    VACCINATION_VISIT_CREATE ( 702, "Document vaccination visit for patient", true );
 
     /**
      * Creates a TransactionType for logging events

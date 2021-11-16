@@ -39,7 +39,7 @@ public class APISatisfactionSurveyController extends APIController {
 
     /** OfficeVisit service */
     @Autowired
-    private OfficeVisitService                  officeVisitService;
+    private OfficeVisitService<OfficeVisit>     officeVisitService;
 
     /** SatisfactionSurveyStats service */
     @Autowired

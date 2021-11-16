@@ -56,28 +56,28 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 @AutoConfigureMockMvc
 public class APISatisfactionSurveyTest {
 
-    private MockMvc                   mvc;
+    private MockMvc                         mvc;
 
     @Autowired
-    private WebApplicationContext     context;
+    private WebApplicationContext           context;
 
     @Autowired
-    private OfficeVisitService        officeVisitService;
+    private OfficeVisitService<OfficeVisit> officeVisitService;
 
     @Autowired
-    private UserService               userService;
+    private UserService                     userService;
 
     @Autowired
-    private AppointmentRequestService appointmentRequestService;
+    private AppointmentRequestService       appointmentRequestService;
 
     @Autowired
-    private HospitalService           hospitalService;
+    private HospitalService                 hospitalService;
 
     @Autowired
-    private BasicHealthMetricsService bhmService;
+    private BasicHealthMetricsService       bhmService;
 
     @Autowired
-    private SatisfactionSurveyService surveyService;
+    private SatisfactionSurveyService       surveyService;
 
     /**
      * Sets up test

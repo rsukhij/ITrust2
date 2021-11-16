@@ -54,25 +54,25 @@ import edu.ncsu.csc.iTrust2.services.UserService;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class APIDiagnosisTest {
-    private MockMvc               mvc;
+    private MockMvc                         mvc;
 
     @Autowired
-    private WebApplicationContext context;
+    private WebApplicationContext           context;
 
     @Autowired
-    private UserService           userService;
+    private UserService                     userService;
 
     @Autowired
-    private HospitalService       hospitalService;
+    private HospitalService                 hospitalService;
 
     @Autowired
-    private DiagnosisService      diagnosisService;
+    private DiagnosisService                diagnosisService;
 
     @Autowired
-    private ICDCodeService        icdCodeService;
+    private ICDCodeService                  icdCodeService;
 
     @Autowired
-    private OfficeVisitService    officeVisitService;
+    private OfficeVisitService<OfficeVisit> officeVisitService;
 
     /**
      * Sets up test

@@ -30,59 +30,59 @@ import edu.ncsu.csc.iTrust2.repositories.OfficeVisitRepository;
  */
 @Component
 @Transactional
-public class OfficeVisitService extends Service<OfficeVisit, Long> {
+public class OfficeVisitService <T extends OfficeVisit> extends Service<T, Long> {
 
     /**
      * Repository for CRUD operations
      */
     @Autowired
-    private OfficeVisitRepository       repository;
+    private OfficeVisitRepository<OfficeVisit> repository;
 
     /**
      * User service
      */
     @Autowired
-    private UserService<User>           userService;
+    private UserService<User>                  userService;
 
     /**
      * AppointmentRequest service
      */
     @Autowired
-    private AppointmentRequestService   appointmentRequestService;
+    private AppointmentRequestService          appointmentRequestService;
 
     /**
      * Hospital Service
      */
     @Autowired
-    private HospitalService             hospitalService;
+    private HospitalService                    hospitalService;
 
     /**
      * BasicHealthMetrics service
      */
     @Autowired
-    private BasicHealthMetricsService   bhmService;
+    private BasicHealthMetricsService          bhmService;
 
     /**
      * OphthalmologyMetrics service
      */
     @Autowired
-    private OphthalmologyMetricsService omService;
+    private OphthalmologyMetricsService        omService;
 
     /**
      * Prescription service
      */
     @Autowired
-    private PrescriptionService         prescriptionService;
+    private PrescriptionService                prescriptionService;
 
     /**
      * Diagnosis service
      */
     @Autowired
-    private DiagnosisService            diagnosisService;
+    private DiagnosisService                   diagnosisService;
 
     @Override
-    protected JpaRepository<OfficeVisit, Long> getRepository () {
-        return repository;
+    protected JpaRepository<T, Long> getRepository () {
+        return (JpaRepository<T, Long>) repository;
     }
 
     /**

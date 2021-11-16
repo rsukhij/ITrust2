@@ -14,11 +14,11 @@ import edu.ncsu.csc.iTrust2.models.User;
  * @author Kai Presler-Marshall
  *
  */
-public interface OfficeVisitRepository extends JpaRepository<OfficeVisit, Long> {
+public interface OfficeVisitRepository <T extends OfficeVisit> extends JpaRepository<OfficeVisit, Long> {
 
     /**
      * Find office visits for a given patient
-     * 
+     *
      * @param hcp
      *            HCP to search by
      * @return Matching visits
@@ -27,7 +27,7 @@ public interface OfficeVisitRepository extends JpaRepository<OfficeVisit, Long> 
 
     /**
      * Find office visits for a given HCP
-     * 
+     *
      * @param patient
      *            Patient to search by
      * @return Matching visits
@@ -36,7 +36,7 @@ public interface OfficeVisitRepository extends JpaRepository<OfficeVisit, Long> 
 
     /**
      * Find office visits for a given HCP and patient
-     * 
+     *
      * @param hcp
      *            HCP to search by
      * @param patient
