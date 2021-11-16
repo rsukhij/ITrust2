@@ -4,11 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import edu.ncsu.csc.iTrust2.models.OfficeVisit;
 import edu.ncsu.csc.iTrust2.models.User;
 import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
 
-public class VaccinationVisitRepository extends JpaRepository<VaccinationVisit, Long> {
+public interface VaccinationVisitRepository extends JpaRepository<VaccinationVisit, Long> {
     /**
      * Find vaccination visits for a given patient
      *
@@ -25,7 +24,7 @@ public class VaccinationVisitRepository extends JpaRepository<VaccinationVisit, 
      *            Patient to search by
      * @return Matching visits
      */
-    public List<OfficeVisit> findByPatient ( User patient );
+    public List<VaccinationVisit> findByPatient ( User patient );
 
     /**
      * Find office visits for a given HCP and patient
