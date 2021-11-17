@@ -4,8 +4,7 @@ import java.io.Serializable;
 
 import javax.validation.constraints.NotEmpty;
 
-import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
-import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
+import edu.ncsu.csc.iTrust2.models.Vaccine;
 
 /**
  * Vaccination Visit form used to document an Vaccination Visit by the HCP or
@@ -32,60 +31,60 @@ public class VaccinationVisitForm implements Serializable {
      * Name of the Patient involved in the VaccinationVisit
      */
     @NotEmpty
-    private String             patient;
+    private String  patient;
 
     /**
      * Name of the HCP involved in the VaccinationVisit
      */
     @NotEmpty
-    private String             hcp;
+    private String  hcp;
 
     /**
      * Date at which the VaccinationVisit occurred
      */
     @NotEmpty
-    private String             date;
+    private String  date;
 
     /**
      * Type of the Vaccine.
      */
     @NotEmpty
-    private String             type;
-
-    /**
-     * Dose Number
-     */
-    @NotEmpty
-    private int                dose;
+    private Vaccine type;
 
     /**
      * Whether the VaccinationVisit was prescheduled or not
      */
-    public String              preScheduled;
+    public String   preScheduled;
 
     /**
      * Date at which the followup visit should
      */
     @NotEmpty
-    private String             followupdate;
+    private String  fdate;
 
     /**
      * Appointment Request of Vaccination Visit
      */
-    private AppointmentRequest appointment;
+    private String  appointment;
 
     /**
-     * Creates an VaccinationVisitForm from the VaccinationVisit provided
-     *
-     * @param ov
-     *            VaccinationVisit to turn into an VaccinationVisitForm
+     * Hospital vaccine was given
      */
-    public VaccinationVisitForm ( final VaccinationVisit ov ) {
-        setPatient( ov.getPatient().getUsername() );
-        setHcp( ov.getHcp().getUsername() );
-        setDate( ov.getDate().toString() );
-        setPreScheduled( ( (Boolean) ( ov.getAppointment() != null ) ).toString() );
-    }
+    private String  hospital;
+
+    // /**
+    // * Creates an VaccinationVisitForm from the VaccinationVisit provided
+    // *
+    // * @param ov
+    // * VaccinationVisit to turn into an VaccinationVisitForm
+    // */
+    // public VaccinationVisitForm ( final VaccinationVisit ov ) {
+    // setPatient( ov.getPatient().getUsername() );
+    // setHcp( ov.getHcp().getUsername() );
+    // setDate( ov.getDate().toString() );
+    // setPreScheduled( ( (Boolean) ( ov.getAppointment() != null ) ).toString()
+    // );
+    // }
 
     /**
      * Get the patient in the VaccinationVisit
@@ -144,12 +143,20 @@ public class VaccinationVisitForm implements Serializable {
         this.date = date;
     }
 
-    public int getDose () {
-        return dose;
+    public String getFdate () {
+        return fdate;
     }
 
-    public void setDose ( final int dose ) {
-        this.dose = dose;
+    public void setFdate ( final String fdate ) {
+        this.fdate = fdate;
+    }
+
+    public String getAppointment () {
+        return appointment;
+    }
+
+    public void setAppointment ( final String appointment ) {
+        this.appointment = appointment;
     }
 
     /**
@@ -157,7 +164,7 @@ public class VaccinationVisitForm implements Serializable {
      *
      * @return Type of the visit
      */
-    public String getType () {
+    public Vaccine getType () {
         return this.type;
     }
 
@@ -167,7 +174,7 @@ public class VaccinationVisitForm implements Serializable {
      * @param type
      *            New Type to set
      */
-    public void setType ( final String type ) {
+    public void setType ( final Vaccine type ) {
         this.type = type;
     }
 
@@ -188,6 +195,14 @@ public class VaccinationVisitForm implements Serializable {
      */
     public String getPreScheduled () {
         return this.preScheduled;
+    }
+
+    public String getHospital () {
+        return hospital;
+    }
+
+    public void setHospital ( final String hospital ) {
+        this.hospital = hospital;
     }
 
 }

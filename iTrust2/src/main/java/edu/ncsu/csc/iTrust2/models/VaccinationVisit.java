@@ -20,21 +20,6 @@ import edu.ncsu.csc.iTrust2.models.enums.PatientVaccinationStatus;
 
 @Entity
 public class VaccinationVisit extends OfficeVisit {
-    // /**
-    // * The patient of this vaccination visit
-    // */
-    // @NotNull
-    // @ManyToOne
-    // @JoinColumn ( name = "patient_id", columnDefinition = "varchar(100)" )
-    // private Patient patient;
-
-    // /**
-    // * The hcp of this vaccination visit
-    // */
-    // @NotNull
-    // @ManyToOne
-    // @JoinColumn ( name = "hcp_id", columnDefinition = "varchar(100)" )
-    // private User hcp;
 
     /**
      * The vaccinator of this vaccination visit
@@ -50,11 +35,6 @@ public class VaccinationVisit extends OfficeVisit {
     private Vaccine                       vaccine;
 
     /**
-     * The visit number
-     */
-    private int                           visitNumber;
-
-    /**
      * The vaccination appointment of this office visit
      */
     @OneToOne
@@ -64,39 +44,6 @@ public class VaccinationVisit extends OfficeVisit {
     /** For Hibernate/Thymeleaf _must_ be an empty constructor */
     public VaccinationVisit () {
     }
-    //
-    // /**
-    // * @return the patient
-    // */
-    // @Override
-    // public User getPatient () {
-    // return patient;
-    // }
-    //
-    // /**
-    // * @param patient
-    // * the patient to set
-    // */
-    // public void setPatient ( final Patient patient ) {
-    // this.patient = patient;
-    // }
-
-    // /**
-    // * @return the hcp
-    // */
-    // @Override
-    // public User getHcp () {
-    // return hcp;
-    // }
-    //
-    // /**
-    // * @param hcp
-    // * the hcp to set
-    // */
-    // @Override
-    // public void setHcp ( final User hcp ) {
-    // this.hcp = hcp;
-    // }
 
     /**
      * @return the vaccinator
@@ -121,35 +68,13 @@ public class VaccinationVisit extends OfficeVisit {
     }
 
     /**
-     * Set vaccine to the choice of the patient in the vaccination appointment
-     * request if it is available. Otherwise, set it to whatever vaccine is
-     * selected by the HCP or Vaccinator
+     * Set vaccine to whatever vaccine is selected by the HCP or Vaccinator
      *
      * @param vaccines
      *            the vaccines to set
      */
     public void setVaccines ( final Vaccine vaccine ) {
-        if ( appointment.getVaccineType().getIfAvailable() ) {
-            this.vaccine = appointment.getVaccineType();
-        }
-        else {
-            this.vaccine = vaccine;
-        }
-    }
-
-    /**
-     * @return the visitNumber
-     */
-    public int getVisitNumber () {
-        return visitNumber;
-    }
-
-    /**
-     * @param visitNumber
-     *            the visitNumber to set
-     */
-    public void setVisitNumber ( final int visitNumber ) {
-        this.visitNumber = visitNumber;
+        this.vaccine = vaccine;
     }
 
     /**
@@ -184,29 +109,14 @@ public class VaccinationVisit extends OfficeVisit {
     }
 
     /**
-     * If the hcp/vaccinator attempts to document a follow-up visit before
-     * documenting an initial visit, there will be an error
-     */
-    public void validateVisitNumber () {
-        final Patient p = (Patient) super.getPatient();
-        if ( vaccine.getIfSecondDose() ) {
-            if ( p.getVaccinationStatus().equals( PatientVaccinationStatus.NO_VACCINATION ) && visitNumber == 2 ) {
-                throw new IllegalArgumentException(
-                        "Can't document a second appointment if there has not been a previous one." );
-            }
-        }
-    }
-
-    /**
      * Updates the vaccination status based on a change in visitNumber
      */
     public void updatePatientVaccinationStatus () {
         final Patient p = (Patient) super.getPatient();
-        if ( !vaccine.ifSecondDose && visitNumber == 1 || vaccine.ifSecondDose && visitNumber == 2 ) {
+        if ( !vaccine.ifSecondDose
+                || vaccine.ifSecondDose && p.getVaccinationStatus() == PatientVaccinationStatus.PARTIALLY_VACCINATED ) {
             p.setVaccinationStatus( PatientVaccinationStatus.FULLY_VACCINATED );
         }
-        if ( vaccine.ifSecondDose && visitNumber == 1 ) {
-            p.setVaccinationStatus( PatientVaccinationStatus.PARTIALLY_VACCINATED );
-        }
+
     }
 }

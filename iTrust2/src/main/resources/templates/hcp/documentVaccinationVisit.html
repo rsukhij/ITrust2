@@ -40,11 +40,11 @@
                             return;
                         }
 
-                        if (!$scope.visit.actualPatient && patient) {
-                            $scope.visit.actualPatient = patient;
+                        if (!$scope.visit.patient && patient) {
+                            $scope.visit.patient = patient;
                         } else if (!patient) {
-                            if ($scope.visit.actualPatient) {
-                                patient = $scope.visit.actualPatient;
+                            if ($scope.visit.patient) {
+                                patient = $scope.visit.patient;
                             } else {
                                 // We don't have enough information to continue
                                 return;
@@ -77,6 +77,8 @@
                         if (age >= 12) {
                             $scope.twelveAndUp = true;
                         }
+                        
+                        $scope.visit.status = $scope.visit.patient.vaccinationStatus;
                  
                     }
 
@@ -100,13 +102,18 @@
     					.then(function (response) {
     						$scope.appointments = response.data;
     					});
+    				
+    				/*Getting a list of hospitals*/
+                    $http.get("/iTrust2/api/v1/hospitals").then(
+                        function (response) {
+                            $scope.hospitals = response.data;
+                        });
                     
     				
                     
                     /* Gets number of doses in selected vaccine */
                     $scope.doses = function() {
                     	$scope.dosesNum = $scope.selectedVaccine.doseNumber;
-                    	$scope.dose = 0;
                     }
                     
                    
@@ -116,17 +123,17 @@
                         $scope.errorMsg = "";
                         $scope.message = "";
                         $scope.visit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
-
+						$scope.visit.type = $scope.selectedVaccine;
 
                         // Validate date and time
                         var date = new Date($scope.visitInputDate);
                         if (!dateTimeService.isValidDate($scope.visitInputDate)) {
-                            $scope.errorMsg += "Please input a valid date\n";
+                            $scope.errorMsg += "Please input a valid visit date\n";
                         }
 
                         const time = new Date($scope.visitInputTime);
                         if (!dateTimeService.isValidDate(time)) {
-                            $scope.errorMsg += "Please input a valid time\n";
+                            $scope.errorMsg += "Please input a valid visit time\n";
                         }
 
                         date.setHours(time.getHours());
@@ -134,10 +141,66 @@
                         
                         // Check valid date and time combination
                         if (!dateTimeService.isValidDate(date)) {
-                            $scope.errorMsg += "Please input a valid date and time\n";
+                            $scope.errorMsg += "Please input a valid visit date and time\n";
                         } else {
                             $scope.visit.date = date.toISOString();
                         }
+                        
+                        
+                        if ($scope.visit.hospital == null) {
+                        	$scope.errorMsg += "Vaccination Visit must have a hospital \n";
+                        }
+                        
+                     	// Validate Follow-Up Appointment date and time
+                     	if ($scope.dosesNum == 2 && $scope.visit.status != 2) {
+                     		//Followup date default
+                     		var next = new Date(date);
+                     		next.setDate(next.getDate() + $scope.selectedVaccine.daysBetween);
+        
+                     		                 		
+	                        
+	                        //If user entered a followup date
+	                        if ($scope.followUpDate != null && $scope.followUpTime != null) {
+	                        
+	                        	var fdate = new Date($scope.followUpDate);
+	                        	
+		                        if (!dateTimeService.isValidDate($scope.followUpDate)) {
+		                            $scope.errorMsg += "Please input a valid follow up date\n";
+		                        }
+		
+		                        const ftime = new Date($scope.followUpTime);
+		                        if (!dateTimeService.isValidDate(ftime)) {
+		                            $scope.errorMsg += "Please input a valid follow up time\n";
+		                        }
+		
+		                        fdate.setHours(ftime.getHours());
+		                        fdate.setMinutes(ftime.getMinutes());
+		                        
+		                        
+		                        // Check valid date and time combination
+		                        if (!dateTimeService.isValidDate(fdate)) {
+		                            $scope.errorMsg += "Please input a valid follow up date and time\n";
+		                        } 
+		                        
+		                        //Check if it's within a day of default
+		                        var low = new Date(next);
+	                     		low.setDate(low.getDate() - 1);
+	                     		var high = new Date(next);
+	                     		high.setDate(high.getDate() + 1);
+		                        
+		                        if (fdate <= low || fdate >= high) {
+		                        	$scope.errorMsg += "Follow Up date must be within 24 hours of " + next + "\n";
+		                        } else {
+		                            $scope.visit.fdate = fdate.toISOString();
+		                        }
+	                        } else {
+	                        	var fdate = next;
+	                        }
+	                        $scope.visit.fdate = fdate.toISOString();
+	                        
+                     	}
+                        
+                        
                         
                        if ($scope.errorMsg == "") {
 
@@ -156,7 +219,6 @@
                           
                         } else {
                             $scope.message = "";
-                            $scope.errorMsg = "Invalid vaccination visit type";
                         }
 
                     } //end submit function
@@ -199,20 +261,33 @@
 								
 								<div class="row">
 								
+									
+								
 								
 									<div class="form-group">
 									<label for="vaccineType">Vaccine Type:
-										</td><select ng-model="" ng-change="dosesNum()"
+										</td><select ng-model="selectedVaccine" ng-change="doses()"
 			                          ng-options="vaccine as vaccine.name for vaccine in vaccines">
 									<option value="">Select Vaccine</option>
 										</select>
 									</div>
-								
-								
-									<div class="col-md-4">
-										<label>Dose Number</label> <input type="number" 
-											class="form-control" name="doses" ng-model="dose"
-											placeholder = "Dose Number" min = "1" max= "2" required />
+									
+									<div class="form-group col-md-4">
+										<label>Hospital:</label>
+										<div class="panel panel-default">
+											<div class="panel-body">
+												<div class="form-check">
+													<ul
+														style="max-height: 15%; overflow: auto; list-style: none;">
+														<li ng-repeat="hospital in hospitals"><label>
+																<input type="radio" ng-model="$parent.visit.hospital"
+																name="hospital" value="{{hospital.name}}"
+																required /> {{hospital.name}}
+														</label></li>
+													</ul>
+												</div>
+											</div>
+										</div>
 									</div>
 								
 								</div>
@@ -242,11 +317,9 @@
 											</div>
 										</div>
 									</div>
-								</div>
 								
-								<div class="row">
 									<div class="form-group col-md-4">
-										<label>Appointment Request:</label>
+										<label>Associated Appointment Request:</label>
 
 										<div class="panel panel-default">
 											<div class="panel-body">
@@ -255,9 +328,9 @@
 														style="max-height: 15%; overflow: auto; list-style: none;">
 														<li ng-repeat="appointment in appointments | filter:searchFilter">
 															<label> <input type="radio"
-																ng-model="$parent.visit.appointment" name="name"
-																value="{{patient.date}}"
-																id="{{patient.date}}" />&nbsp;{{patient.date.toString()}}
+																ng-model="$parent.visit.appointment" name="req"
+																value="{{appointment.date}}"
+																id="{{appointment.date}}" />&nbsp;{{appointment.patient.username}} at {{appointment.date}}
 														</label>
 														</li>
 													</ul>
@@ -267,18 +340,21 @@
 									</div>
 								</div>
 								
-								<div class="row">
-									<div ng-show="dosesNum == 2" class="form-group">
+								<div ng-show="dosesNum == 2 && status != 2" class="form-group">
+								    <label>Follow-Up Appointment:</label>
+									<div class="row">
+													
+										
 										<div class="form-group col-md-2">
 											<label for="date">Date:</label> <input id="date" type="date"
-												class="form-control" ng-model="followupInputDate" name="date"
-												ng-change="patientSelect(null);" required="true" />
+												class="form-control" ng-model="followUpDate" name="date"
+												  />
 										</div>
 	
 										<div class="form-group col-md-2">
 											<label for="time">Time:</label> <input id="time" type="time"
-												name="time" class="form-control" ng-model="followupInputTime"
-												required="true" />
+												name="time" class="form-control" ng-model="followUpTime"
+												 />
 										</div>
 									</div>
 								</div>
