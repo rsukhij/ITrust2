@@ -5,7 +5,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-
 /**
  * Represents a VaccinationAppointmentRequest in the system
  *
@@ -22,7 +21,6 @@ public class VaccinationAppointmentRequest extends AppointmentRequest {
     @ManyToOne
     @JoinColumn ( name = "vaccine_name", columnDefinition = "varchar(100)" )
     private Vaccine vaccineType;
-
 
     /**
      * Sets the vaccine type
@@ -42,4 +40,5 @@ public class VaccinationAppointmentRequest extends AppointmentRequest {
     public void setVaccineType ( final Vaccine vaccineType ) {
         this.vaccineType = vaccineType;
     }
+
 }

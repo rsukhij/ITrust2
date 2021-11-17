@@ -3,7 +3,6 @@ package edu.ncsu.csc.iTrust2.services;
 import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
@@ -12,11 +11,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 import edu.ncsu.csc.iTrust2.forms.VaccinationVisitForm;
-import edu.ncsu.csc.iTrust2.models.AppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.User;
+import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
+import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.repositories.VaccinationVisitRepository;
 
 @Component
@@ -40,6 +40,12 @@ public class VaccinationVisitService extends Service<VaccinationVisit, Long> {
      */
     @Autowired
     private VaccinationAppointmentRequestService appointmentRequestService;
+
+    /**
+     * Hospital Service
+     */
+    @Autowired
+    private HospitalService                      hospitalService;
 
     /**
      * Vaccine service
@@ -95,68 +101,65 @@ public class VaccinationVisitService extends Service<VaccinationVisit, Long> {
      * @return Constructed VaccinationVisit
      */
     public VaccinationVisit build ( final VaccinationVisitForm visitForm ) {
-        final VaccinationVisit ov = new VaccinationVisit();
+        final VaccinationVisit v = new VaccinationVisit();
 
-        ov.setPatient( userService.findByName( visitForm.getPatient() ) );
-        ov.setHcp( userService.findByName( visitForm.getHcp() ) );
+        v.setPatient( userService.findByName( visitForm.getPatient() ) );
+        v.setHcp( userService.findByName( visitForm.getHcp() ) );
 
         final ZonedDateTime visitDate = ZonedDateTime.parse( visitForm.getDate() );
-        ov.setDate( visitDate );
+        v.setDate( visitDate );
 
-        AppointmentType at = null;
-        try {
-            at = AppointmentType.valueOf( visitForm.getType() );
-        }
-        catch ( final NullPointerException npe ) {
-            at = AppointmentType.VACCINATION; /*
-                                               * If for some reason we don't
-                                               * have a type, default to general
-                                               * checkup
-                                               */
-        }
-        ov.setType( at );
+        if ( null != visitForm.getPreScheduled() && visitForm.getAppointment() == null ) {
 
-        if ( null != visitForm.getPreScheduled() ) {
-            final List<AppointmentRequest> requests = appointmentRequestService.findByHcpAndPatient( ov.getHcp(),
-                    ov.getPatient() );
-            try {
-                final AppointmentRequest match = requests.stream().filter( e -> e.getDate().equals( ov.getDate() ) )
-                        .collect( Collectors.toList() )
-                        .get( 0 ); /*
-                                    * We should have one and only one
-                                    * appointment for the provided HCP & patient
-                                    * and the time specified
-                                    */
-                ov.setAppointment( match );
+            throw new IllegalArgumentException( "Marked as preschedule but no match can be found" );
+
+        }
+        if ( visitForm.getAppointment() != null ) {
+            final ZonedDateTime appDate = ZonedDateTime.parse( visitForm.getAppointment() );
+
+            if ( appDate.minusHours( 3 ).isAfter( visitDate ) || appDate.plusHours( 3 ).isBefore( visitDate ) ) {
+                throw new IllegalArgumentException(
+                        "Vaccination Visit must be within 3 hours of associated Appointment" );
             }
-            catch ( final Exception e ) {
-                throw new IllegalArgumentException( "Marked as preschedule but no match can be found" + e.toString() );
-            }
-
         }
 
-        // final List<PrescriptionForm> ps = ovf.getPrescriptions();
-        // if ( ps != null ) {
-        // ov.setPrescriptions( ps.stream().map( prescriptionService::build
-        // ).collect( Collectors.toList() ) );
-        // }
+        if ( visitForm.getFdate() != null ) {
 
-        final Patient p = (Patient) ov.getPatient();
+            final ZonedDateTime followDate = ZonedDateTime.parse( visitForm.getFdate() );
+
+            final VaccinationAppointmentRequest app = new VaccinationAppointmentRequest();
+            app.setComments( null );
+            app.setDate( followDate );
+            app.setHcp( v.getHcp() );
+            app.setPatient( userService.findByName( visitForm.getPatient() ) );
+            app.setStatus( Status.APPROVED );
+            app.setType( AppointmentType.VACCINATION );
+            app.setVaccineType( visitForm.getType() );
+            appointmentRequestService.save( app );
+        }
+
+        v.setType( AppointmentType.VACCINATION );
+        v.setVaccinator( v.getHcp() );
+        v.setVaccines( visitForm.getType() );
+        v.setHospital( hospitalService.findByName( visitForm.getHospital() ) );
+
+        final Patient p = (Patient) v.getPatient();
         if ( p == null || p.getDateOfBirth() == null ) {
-            return ov; // we're done, patient can't be tested against
+            return v; // we're done, patient can't be tested against
         }
         final LocalDate dob = p.getDateOfBirth();
-        int age = ov.getDate().getYear() - dob.getYear();
+        int age = v.getDate().getYear() - dob.getYear();
         // Remove the -1 when changing the dob to OffsetDateTime
-        if ( ov.getDate().getMonthValue() < dob.getMonthValue() ) {
+        if ( v.getDate().getMonthValue() < dob.getMonthValue() ) {
             age -= 1;
         }
-        else if ( ov.getDate().getMonthValue() == dob.getMonthValue() ) {
-            if ( ov.getDate().getDayOfMonth() < dob.getDayOfMonth() ) {
+        else if ( v.getDate().getMonthValue() == dob.getMonthValue() ) {
+            if ( v.getDate().getDayOfMonth() < dob.getDayOfMonth() ) {
                 age -= 1;
             }
         }
-        return ov;
+
+        return v;
     }
 
 }
