@@ -15,7 +15,7 @@ import edu.ncsu.csc.iTrust2.config.SchemaValidateIntegrator;
  * @author Kai Presler-Marshall
  *
  */
-@SpringBootApplication ( scanBasePackages = { "edu.ncsu.csc.iTrust2" } )
+@SpringBootApplication ( scanBasePackages = { "edu.ncsu.csc.iTrust2" }, exclude = { ErrorMvcAutoConfiguration.class } )
 @EnableAutoConfiguration ( exclude = { ErrorMvcAutoConfiguration.class } )
 public class ITrust2Application {
 
