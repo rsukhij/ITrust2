@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -60,7 +61,7 @@ public class APIVaccinationCertificateController extends APIController {
      */
     @SuppressWarnings ( { "rawtypes", "unchecked" } )
     @GetMapping ( BASE_PATH + "/vaccinecertificate" )
-    // TODO Do we need a PreAuthorize here?
+    @PreAuthorize ( "hasAnyRole('ROLE_PATIENT')" )
     public ResponseEntity<byte[]> downloadCertificate () {
         final Patient self = (Patient) userService.findByName( LoggerUtil.currentUser() );
         loggerUtil.log( TransactionType.VIEW_ALL_VACCINATION_VISITS, self );
@@ -68,7 +69,6 @@ public class APIVaccinationCertificateController extends APIController {
 
         final OutputStream output = null;
         try {
-            // output = new FileOutputStream( new File( "Certificate.pdf" ) );
 
             final Document certificate = new Document( PageSize.LETTER, 0.75F, 0.75F, 0.75F, 0.75F );
             final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
