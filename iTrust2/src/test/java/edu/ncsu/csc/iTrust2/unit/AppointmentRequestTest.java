@@ -28,12 +28,24 @@ import edu.ncsu.csc.iTrust2.models.enums.Role;
 @SpringBootTest ( classes = TestConfig.class )
 public class AppointmentRequestTest {
 
+    /**
+     * String field to hold the test user 1
+     */
     private static final String USER_1 = "demoTestUser1";
 
+    /**
+     * String field to hold the test user 2
+     */
     private static final String USER_2 = "demoTestUser2";
 
+    /**
+     * String field to hold the test password
+     */
     private static final String PW     = "123456";
 
+    /**
+     * Test for the creation of a vaccination appointment request
+     */
     @Test
     @Transactional
     public void testCreateAppointmentRequest () {
