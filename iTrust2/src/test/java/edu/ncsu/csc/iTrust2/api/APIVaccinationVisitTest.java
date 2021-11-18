@@ -39,20 +39,16 @@ import edu.ncsu.csc.iTrust2.models.enums.Ethnicity;
 import edu.ncsu.csc.iTrust2.models.enums.Gender;
 import edu.ncsu.csc.iTrust2.models.enums.Role;
 import edu.ncsu.csc.iTrust2.models.enums.State;
-import edu.ncsu.csc.iTrust2.services.AppointmentRequestService;
-import edu.ncsu.csc.iTrust2.services.BasicHealthMetricsService;
 import edu.ncsu.csc.iTrust2.services.HospitalService;
-import edu.ncsu.csc.iTrust2.services.OfficeVisitService;
 import edu.ncsu.csc.iTrust2.services.UserService;
 import edu.ncsu.csc.iTrust2.services.VaccinationVisitService;
 import edu.ncsu.csc.iTrust2.services.VaccineService;
 
 /**
- * Test for the API functionality for interacting with office visits
+ * Test for the API functionality for interacting with vaccination visits.
+ * Based off of OfficeVisitTest.
  *
- * @author Kai Presler-Marshall
- * @author Justin Takamiya
- *
+ * @author Justin Takamiya (jjtakami@ncsu.edu)
  */
 @RunWith ( SpringRunner.class )
 @SpringBootTest
@@ -63,9 +59,6 @@ public class APIVaccinationVisitTest {
 
     @Autowired
     private WebApplicationContext     context;
-
-    @Autowired
-    private OfficeVisitService        officeVisitService;
     
     @Autowired
     private VaccinationVisitService   vaccinationVisitService;
@@ -73,14 +66,10 @@ public class APIVaccinationVisitTest {
     @Autowired
     private UserService               userService;
 
-    @Autowired
-    private AppointmentRequestService appointmentRequestService;
 
     @Autowired
     private HospitalService           hospitalService;
 
-    @Autowired
-    private BasicHealthMetricsService bhmService;
     
     @Autowired
     private VaccineService            vaccineService;
@@ -91,10 +80,6 @@ public class APIVaccinationVisitTest {
     @Before
     public void setup () {
         mvc = MockMvcBuilders.webAppContextSetup( context ).build();
-
-        officeVisitService.deleteAll();
-
-        appointmentRequestService.deleteAll();
 
         final User patient = new Patient( new UserForm( "patient", "123456", Role.ROLE_PATIENT, 1 ) );
 
