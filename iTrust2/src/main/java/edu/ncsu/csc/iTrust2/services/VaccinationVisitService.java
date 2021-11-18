@@ -13,10 +13,8 @@ import org.springframework.stereotype.Component;
 import edu.ncsu.csc.iTrust2.forms.VaccinationVisitForm;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.User;
-import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
-import edu.ncsu.csc.iTrust2.models.enums.Status;
 import edu.ncsu.csc.iTrust2.repositories.VaccinationVisitRepository;
 
 @Component
@@ -103,51 +101,24 @@ public class VaccinationVisitService extends Service<VaccinationVisit, Long> {
     public VaccinationVisit build ( final VaccinationVisitForm visitForm ) {
         final VaccinationVisit v = new VaccinationVisit();
 
-        v.setPatient( userService.findByName( visitForm.getPatient() ) );
+        final Patient p = (Patient) userService.findByName( visitForm.getPatient() );
+
+        v.setPatient( p );
         v.setHcp( userService.findByName( visitForm.getHcp() ) );
 
         final ZonedDateTime visitDate = ZonedDateTime.parse( visitForm.getDate() );
         v.setDate( visitDate );
-
-        if ( null != visitForm.getPreScheduled() && visitForm.getAppointment() == null ) {
-
-            throw new IllegalArgumentException( "Marked as preschedule but no match can be found" );
-
-        }
-        if ( visitForm.getAppointment() != null ) {
-            final ZonedDateTime appDate = ZonedDateTime.parse( visitForm.getAppointment() );
-
-            if ( appDate.minusHours( 3 ).isAfter( visitDate ) || appDate.plusHours( 3 ).isBefore( visitDate ) ) {
-                throw new IllegalArgumentException(
-                        "Vaccination Visit must be within 3 hours of associated Appointment" );
-            }
-        }
-
-        if ( visitForm.getFdate() != null ) {
-
-            final ZonedDateTime followDate = ZonedDateTime.parse( visitForm.getFdate() );
-
-            final VaccinationAppointmentRequest app = new VaccinationAppointmentRequest();
-            app.setComments( null );
-            app.setDate( followDate );
-            app.setHcp( v.getHcp() );
-            app.setPatient( userService.findByName( visitForm.getPatient() ) );
-            app.setStatus( Status.APPROVED );
-            app.setType( AppointmentType.VACCINATION );
-            app.setVaccineType( visitForm.getType() );
-            appointmentRequestService.save( app );
-        }
 
         v.setType( AppointmentType.VACCINATION );
         v.setVaccinator( v.getHcp() );
         v.setVaccines( visitForm.getType() );
         v.setHospital( hospitalService.findByName( visitForm.getHospital() ) );
 
-        final Patient p = (Patient) v.getPatient();
-        if ( p == null || p.getDateOfBirth() == null ) {
+        final Patient p2 = (Patient) v.getPatient();
+        if ( p2 == null || p2.getDateOfBirth() == null ) {
             return v; // we're done, patient can't be tested against
         }
-        final LocalDate dob = p.getDateOfBirth();
+        final LocalDate dob = p2.getDateOfBirth();
         int age = v.getDate().getYear() - dob.getYear();
         // Remove the -1 when changing the dob to OffsetDateTime
         if ( v.getDate().getMonthValue() < dob.getMonthValue() ) {

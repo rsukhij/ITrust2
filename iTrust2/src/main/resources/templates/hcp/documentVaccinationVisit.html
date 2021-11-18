@@ -78,6 +78,7 @@
                             $scope.twelveAndUp = true;
                         }
                         
+                        //STORES PATIENT VACCINATION STATUS
                         $scope.visit.status = $scope.visit.patient.vaccinationStatus;
                  
                     }
@@ -113,6 +114,8 @@
                     
                     /* Gets number of doses in selected vaccine */
                     $scope.doses = function() {
+                    	//Doses in the vaccine, helps determine if follow up appointment should be should
+                    	//only called when a vaccine is chosen
                     	$scope.dosesNum = $scope.selectedVaccine.doseNumber;
                     }
                     
@@ -122,8 +125,11 @@
                     $scope.submit = function () {
                         $scope.errorMsg = "";
                         $scope.message = "";
+                        //Goten from office visit version
                         $scope.visit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
-						$scope.visit.type = $scope.selectedVaccine;
+						//stores type of vaccine
+                        $scope.visit.type = $scope.selectedVaccine;
+                        
 
                         // Validate date and time
                         var date = new Date($scope.visitInputDate);
@@ -146,7 +152,7 @@
                             $scope.visit.date = date.toISOString();
                         }
                         
-                        
+                        //Check hospital was selected
                         if ($scope.visit.hospital == null) {
                         	$scope.errorMsg += "Vaccination Visit must have a hospital \n";
                         }
@@ -163,7 +169,7 @@
 	                        if ($scope.followUpDate != null && $scope.followUpTime != null) {
 	                        
 	                        	var fdate = new Date($scope.followUpDate);
-	                        	
+	                        	//Checks followup date
 		                        if (!dateTimeService.isValidDate($scope.followUpDate)) {
 		                            $scope.errorMsg += "Please input a valid follow up date\n";
 		                        }
@@ -217,6 +223,8 @@
                                  $scope.errorMsg = "Error occurred creating vaccination visit: " + rejection.data.message;
                              })
                           
+                             $scope.visit = null;
+                             
                         } else {
                             $scope.message = "";
                         }
@@ -340,7 +348,7 @@
 									</div>
 								</div>
 								
-								<div ng-show="dosesNum == 2 && status != 2" class="form-group">
+								<div ng-show="dosesNum == 2 && visit.status != 1" class="form-group">
 								    <label>Follow-Up Appointment:</label>
 									<div class="row">
 													
