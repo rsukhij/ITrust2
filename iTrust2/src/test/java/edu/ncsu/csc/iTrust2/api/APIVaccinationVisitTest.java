@@ -99,6 +99,10 @@ public class APIVaccinationVisitTest {
         hospitalService.save( hosp );
     }
 
+    /**
+     * Helper method for building a Patient.
+     * @return the patient that was created
+     */
     private Patient buildPatient () {
         final Patient antti = new Patient( new UserForm( "antti", "123456", Role.ROLE_PATIENT, 1 ) );
 
@@ -121,7 +125,7 @@ public class APIVaccinationVisitTest {
     }
 
     /**
-     * Tests getting a non existent office visit and ensures that the correct
+     * Tests getting a non existent vaccination visit and ensures that the correct
      * status is returned.
      *
      * @throws Exception
@@ -134,21 +138,21 @@ public class APIVaccinationVisitTest {
     }
     
     /**
-     * Tests OfficeVisitAPI
+     * Tests VaccinationVisitAPI
      *
      * @throws Exception
      */
     @Test
     @Transactional
     @WithMockUser ( username = "hcp", roles = { "HCP" } )
-    public void testOfficeVisitAPI () throws Exception {
+    public void testVaccinationVisitAPI () throws Exception {
 
         Assert.assertEquals( 0, vaccinationVisitService.count() );
 
         final VaccinationVisitForm visit = new VaccinationVisitForm();
         visit.setDate( "2030-11-19T04:50:00.000-05:00" );
         visit.setHcp( "hcp" );
-        visit.setPatient( "patient" );        
+        visit.setPatient( "patient" );
         
         // Create Vaccine
         final Vaccine pfizer = new Vaccine();
@@ -164,7 +168,7 @@ public class APIVaccinationVisitTest {
         visit.setType( pfizer );
         visit.setHospital( "iTrust Test Hospital 2" );
 
-        /* Create the Office Visit */
+        /* Create the Vaccination Visit */
         mvc.perform( post( "/api/v1/vaccinationvisits" ).contentType( MediaType.APPLICATION_JSON )
                 .content( TestUtils.asJsonString( visit ) ) ).andExpect( status().isOk() );
 
