@@ -1,7 +1,5 @@
 package edu.ncsu.csc.iTrust2.unit;
 
-import static org.junit.Assert.assertEquals;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -20,11 +18,9 @@ import edu.ncsu.csc.iTrust2.TestConfig;
 import edu.ncsu.csc.iTrust2.forms.UserForm;
 import edu.ncsu.csc.iTrust2.models.BasicHealthMetrics;
 import edu.ncsu.csc.iTrust2.models.Hospital;
-import edu.ncsu.csc.iTrust2.models.OfficeVisit;
 import edu.ncsu.csc.iTrust2.models.Patient;
 import edu.ncsu.csc.iTrust2.models.Personnel;
 import edu.ncsu.csc.iTrust2.models.User;
-import edu.ncsu.csc.iTrust2.models.VaccinationAppointmentRequest;
 import edu.ncsu.csc.iTrust2.models.VaccinationVisit;
 import edu.ncsu.csc.iTrust2.models.Vaccine;
 import edu.ncsu.csc.iTrust2.models.enums.AppointmentType;
@@ -63,16 +59,23 @@ public class VaccinationVisitTest {
     @Autowired
     private VaccineService            vaccineService;
     
+    /** A vaccinator */
     private User vaccinator;
+    
+    /** An HCP */
+    private User hcp;
+    
+    /** A patient */
+    private User alice;
 
     @Before
     public void setup () {
         vaccinationVisitService.deleteAll();
         vaccineService.deleteAll();
 
-        final User hcp = new Personnel( new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 ) );
+        hcp = new Personnel( new UserForm( "hcp", "123456", Role.ROLE_HCP, 1 ) );
 
-        final User alice = new Patient( new UserForm( "AliceThirteen", "123456", Role.ROLE_PATIENT, 1 ) );
+        alice = new Patient( new UserForm( "AliceThirteen", "123456", Role.ROLE_PATIENT, 1 ) );
         
         vaccinator = new Personnel( new UserForm("vaccinator", "123456", Role.ROLE_VACCINATOR, 1));
         
@@ -88,15 +91,15 @@ public class VaccinationVisitTest {
         final Hospital hosp = new Hospital( "Dr. Jenkins' Insane Asylum", "123 Main St", "12345", "NC" );
         hospitalService.save( hosp );
         
-        final Vaccine v = new Vaccine();
-        v.setName( "Pfizer" );
-        v.setAgeMax( 100 );
-        v.setAgeMin( 12 );
-        v.setDoseNumber( 1 );
-        v.setIfSecondDose( true );
-        v.setDaysBetween( 21 );
-        v.setIfAvailable( true );
-        vaccineService.save(v);
+        final Vaccine vaccine = new Vaccine();
+        vaccine.setName( "Pfizer" );
+        vaccine.setAgeMax( 100 );
+        vaccine.setAgeMin( 12 );
+        vaccine.setDoseNumber( 1 );
+        vaccine.setIfSecondDose( true );
+        vaccine.setDaysBetween( 21 );
+        vaccine.setIfAvailable( true );
+        vaccineService.save(vaccine);
 
         final VaccinationVisit visit = new VaccinationVisit();
 
@@ -116,12 +119,20 @@ public class VaccinationVisitTest {
         visit.setType( AppointmentType.GENERAL_CHECKUP );
         visit.setHospital( hosp );
         visit.setPatient( userService.findByName( "AliceThirteen" ) );
-        visit.setHcp( userService.findByName( "AliceThirteen" ) );
+        visit.setHcp( userService.findByName( "hcp" ) );
         visit.setDate( ZonedDateTime.now() );
-        visit.setVaccines(v);
+        visit.setVaccines(vaccine);
         visit.setVaccinator(userService.findByName("vaccinator"));
         vaccinationVisitService.save( visit );
         
         Assert.assertEquals( 1, vaccinationVisitService.count() );
+        
+        VaccinationVisit retrieved = vaccinationVisitService.findAll().get( 0 );
+        
+        Assert.assertEquals(hosp, retrieved.getHospital());
+        Assert.assertEquals(vaccine, retrieved.getVaccines());
+        Assert.assertEquals(alice, retrieved.getPatient());
+        Assert.assertEquals(hcp, retrieved.getHcp());
+        Assert.assertEquals(vaccinator, retrieved.getVaccinator());
     }
 }
