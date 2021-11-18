@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="layout :: head(title=~{::title},links=~{})">
+<title>Vaccine Certificate</title>
+
+<!-- Angular and Bootstrap files  -->
+<link rel="stylesheet"
+	href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+</head>
+
+<body th:include="layout :: body" th:with="content=~{::content}">
+	<div th:fragment="content">
+
+		<script th:inline="javascript">
+		/* Otherwise Thymeleaf tries to parse Javascript as XML and breaks itself sometimes.  Sigh */
+		/*<![CDATA[*/
+			var app = angular.module("viewCertificate", []);
+			app.controller('controller', function($scope, $http) {
+				
+				 $scope.downloadPdf = function () {
+					 	console.log("hi");
+			            var fileName = "test.pdf";
+			            var a = document.createElement("a");
+			            document.body.appendChild(a);
+			            a.style = "display: none";
+			            $http.get('/iTrust2/api/v1/vaccinecertificate', { responseType: 'arraybuffer' }).then(function (result) {
+			                var file = new Blob([result.data], {type: 'application/pdf'});
+			                var fileURL = window.URL.createObjectURL(file);
+			                a.href = fileURL;
+			                a.download = fileName;
+			                a.click();
+			            });
+			        };
+			});
+			angular.module('viewCertificate')
+		    .factory('ServicePDF', function ($http) {
+		        return {
+		            downloadPdf: function () {
+		            return $http.get('api/v1/vaccinecertificate', { responseType: 'arraybuffer' }).then(function (response) {
+		                return response;
+		            });
+		        }
+		    };
+		});
+		</script>
+		<div ng-app="viewCertificate" ng-controller="controller">
+			<h1>Click to download vaccine certificate for Patient</h1>
+			<button ng-click="downloadPdf()" class="btn btn-primary">Download!</button>
+		</div>
+
+	</div>
+</body>
+</html>

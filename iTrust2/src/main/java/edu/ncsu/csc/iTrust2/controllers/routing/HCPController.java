@@ -93,4 +93,17 @@ public class HCPController {
         return "/hcp/documentOfficeVisit";
     }
 
+    /**
+     * Returns the form page for a HCP to document a VaccinationVisit
+     *
+     * @param model
+     *            The data for the front end
+     * @return Page to display to the user
+     */
+    @GetMapping ( "/hcp/documentVaccinationVisit" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    public String documentVaccinationVisit ( final Model model ) {
+        return "/hcp/documentVaccinationVisit";
+    }
+
 }

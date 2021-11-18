@@ -4,16 +4,18 @@ import javax.servlet.Filter;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.authentication.configurers.provisioning.JdbcUserDetailsManagerConfigurer;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.channel.ChannelProcessingFilter;
@@ -24,7 +26,7 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
  * Configures Spring security. Tells Spring how to find users in the system,
  * which API routes (don't) require authentication, and configures a few other
  * pieces of the security system.
- * 
+ *
  * @author Kai Presler-Marshall
  *
  */
@@ -37,7 +39,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * DataSource used for connecting to and interacting with the database.
      */
     @Autowired
-    DataSource dataSource;
+    DataSource         dataSource;
+
+    @Autowired
+    @Qualifier ( "customUserDetailsService" )
+    UserDetailsService userDetailsService;
 
     /**
      * Login configuration for iTrust2.
@@ -50,20 +56,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Autowired
     public void configureGlobal ( final AuthenticationManagerBuilder auth ) throws Exception {
-        final JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder> dbManager = auth.jdbcAuthentication();
-
-        // User query enabled flag also checks for locked or banned users. The
-        // FailureHandler then
-        // determines if the DisabledUser Exception was due to ban, lockout, or
-        // true disable.
-        // POSSIBLE FUTURE CHANGE: Refactor the UserSource here along the lines
-        // of this:
-        // http://websystique.com/springmvc/spring-mvc-4-and-spring-security-4-integration-example/
-        dbManager.dataSource( dataSource ).passwordEncoder( passwordEncoder() )
-                .usersByUsernameQuery( "select username,password,enabled from user WHERE username = ?;" )
-                .authoritiesByUsernameQuery( "select user_username, roles from user_roles where user_username=?" );
-        auth.authenticationEventPublisher( defaultAuthenticationEventPublisher() );
-
+        /**
+         * final JdbcUserDetailsManagerConfigurer<AuthenticationManagerBuilder>
+         * dbManager = auth.jdbcAuthentication();
+         * 
+         * // User query enabled flag also checks for locked or banned users.
+         * The // FailureHandler then // determines if the DisabledUser
+         * Exception was due to ban, lockout, or // true disable. // POSSIBLE
+         * FUTURE CHANGE: Refactor the UserSource here along the lines // of
+         * this: //
+         * http://websystique.com/springmvc/spring-mvc-4-and-spring-security-4-integration-example/
+         * /** dbManager.dataSource( dataSource ).passwordEncoder(
+         * passwordEncoder() ) .usersByUsernameQuery( "select
+         * username,password,enabled from user WHERE username = ?;" )
+         * .authoritiesByUsernameQuery( "select user_username, roles from
+         * user_roles where user_username=?" );
+         * auth.authenticationEventPublisher(
+         * defaultAuthenticationEventPublisher() );
+         */
+        // TODO refactor search here
+        auth.userDetailsService( userDetailsService );
+        auth.authenticationProvider( authenticationProvider() );
     }
 
     /**
@@ -107,6 +120,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // forgotten password
         web.ignoring().antMatchers( "/api/v1/requestPasswordReset", "/api/v1/resetPassword/*", "/requestPasswordReset",
                 "/resetPassword", "/api/v1/generateUsers", "/viewEmails", "/api/v1/emails" );
+    }
+
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider () {
+        final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setUserDetailsService( userDetailsService );
+        authenticationProvider.setPasswordEncoder( passwordEncoder() );
+        return authenticationProvider;
     }
 
     /**
