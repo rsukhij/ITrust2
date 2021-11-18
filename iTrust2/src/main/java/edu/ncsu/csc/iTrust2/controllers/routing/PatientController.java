@@ -70,6 +70,19 @@ public class PatientController {
     }
 
     /**
+     * Returns the page for a Patient to download a vaccination certificate
+     *
+     * @param model
+     *            The data for the front end
+     * @return Page to display to the user
+     */
+    @GetMapping ( "/patient/officeVisit/viewCertificate" )
+    @PreAuthorize ( "hasAnyRole('ROLE_PATIENT')" )
+    public String viewCertificate ( final Model model ) {
+        return "/patient/officeVisit/viewCertificate";
+    }
+
+    /**
      * Provides the page for a User to view and edit their demographics
      *
      * @param model
