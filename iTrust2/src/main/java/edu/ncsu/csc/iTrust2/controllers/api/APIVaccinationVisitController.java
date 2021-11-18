@@ -55,7 +55,7 @@ public class APIVaccinationVisitController extends APIController {
      * @return list of vaccination visits
      */
     @GetMapping ( BASE_PATH + "/vaccinationvisits" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public List<VaccinationVisit> getVaccinationVisits () {
         loggerUtil.log( TransactionType.VIEW_ALL_VACCINATION_VISITS, LoggerUtil.currentUser() );
         return vaccinationVisitService.findAll();
@@ -67,7 +67,7 @@ public class APIVaccinationVisitController extends APIController {
      * @return all of the vaccination visits for the current HCP.
      */
     @GetMapping ( BASE_PATH + "/vaccinationvisits/HCP" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public List<VaccinationVisit> getVaccinationVisitsForHCP () {
         final User self = userService.findByName( LoggerUtil.currentUser() );
         loggerUtil.log( TransactionType.VIEW_ALL_VACCINATION_VISITS, self );
@@ -97,7 +97,7 @@ public class APIVaccinationVisitController extends APIController {
      * @return list of vaccination visits
      */
     @GetMapping ( BASE_PATH + "/vaccinationvisits/{id}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public ResponseEntity getVaccinationVisit ( @PathVariable final Long id ) {
         final User self = userService.findByName( LoggerUtil.currentUser() );
         loggerUtil.log( TransactionType.GENERAL_CHECKUP_HCP_VIEW, self );
@@ -116,7 +116,7 @@ public class APIVaccinationVisitController extends APIController {
      * @return response
      */
     @PostMapping ( BASE_PATH + "/vaccinationvisits" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public ResponseEntity createVaccinationVisit ( @RequestBody final VaccinationVisitForm visitForm ) {
         try {
             final VaccinationVisit visit = vaccinationVisitService.build( visitForm );

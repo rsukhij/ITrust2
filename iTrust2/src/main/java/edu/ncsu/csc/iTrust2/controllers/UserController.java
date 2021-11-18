@@ -30,14 +30,14 @@ public class UserController {
      * @return response
      */
     @GetMapping ( value = "personnel/editDemographics" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_ADMIN', 'ROLE_VACCINATOR')" )
     public String viewDemographics ( final Model model ) {
         return "/personnel/editDemographics";
     }
 
     /**
      * Serves back our hero, Dr. Leeroy Jenkins.
-     * 
+     *
      * @return Image for Dr. Jenkins
      * @throws IOException
      *             if file can't be found

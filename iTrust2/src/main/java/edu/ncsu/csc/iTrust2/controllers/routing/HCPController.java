@@ -101,7 +101,7 @@ public class HCPController {
      * @return Page to display to the user
      */
     @GetMapping ( "/hcp/documentVaccinationVisit" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public String documentVaccinationVisit ( final Model model ) {
         return "/hcp/documentVaccinationVisit";
     }

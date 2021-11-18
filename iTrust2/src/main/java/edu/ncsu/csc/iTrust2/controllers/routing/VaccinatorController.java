@@ -45,17 +45,17 @@ public class VaccinatorController {
         return "vaccinator/appointmentRequests";
     }
 
-    /**
-     * Returns the form page for a Vaccinator to document a VaccinationVisit
-     *
-     * @param model
-     *            The data for the front end
-     * @return Page to display to the user
-     */
-    @GetMapping ( "/vaccinator/documentVaccinationVisit" )
-    @PreAuthorize ( "hasAnyRole('ROLE_VACCINATOR')" )
-    public String documentVaccinationVisit ( final Model model ) {
-        return "/vaccinator/documentVaccinationVisit";
-    }
+    // /**
+    // * Returns the form page for a Vaccinator to document a VaccinationVisit
+    // *
+    // * @param model
+    // * The data for the front end
+    // * @return Page to display to the user
+    // */
+    // @GetMapping ( "/vaccinator/documentVaccinationVisit" )
+    // @PreAuthorize ( "hasAnyRole('ROLE_VACCINATOR')" )
+    // public String documentVaccinationVisit ( final Model model ) {
+    // return "/vaccinator/documentVaccinationVisit";
+    // }
 
 }

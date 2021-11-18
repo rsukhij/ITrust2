@@ -73,7 +73,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return list of appointment requests
      */
     @GetMapping ( BASE_PATH + "/appointmentrequests" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public List<AppointmentRequest> getAppointmentRequests () {
         final List<AppointmentRequest> requests = service.findAll();
 
@@ -108,7 +108,7 @@ public class APIAppointmentRequestController extends APIController {
     @PreAuthorize ( "hasAnyRole('ROLE_PATIENT')" )
     public List<AppointmentRequest> getAppointmentRequestsForPatient () {
         final User patient = userService.findByName( LoggerUtil.currentUser() );
-        return service.findByPatient( patient ).stream().filter( e -> e.getStatus().equals( Status.PENDING ) )
+        return service.findByPatient( patient ).stream().filter( e -> !e.getStatus().equals( Status.REJECTED ) )
                 .collect( Collectors.toList() );
     }
 
@@ -118,7 +118,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return list of appointment requests for the logged in hcp
      */
     @GetMapping ( BASE_PATH + "/appointmentrequestForHCP" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_VACCINATOR')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public List<AppointmentRequest> getAppointmentRequestsForHCP () {
 
         final User hcp = userService.findByName( LoggerUtil.currentUser() );
@@ -264,7 +264,7 @@ public class APIAppointmentRequestController extends APIController {
      *         provided
      */
     @PutMapping ( BASE_PATH + "/appointmentrequests/{id}" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_PATIENT')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" + "|| hasAnyRole('ROLE_PATIENT')" )
     public ResponseEntity updateAppointmentRequest ( @PathVariable final Long id,
             @RequestBody final AppointmentRequestForm requestF ) {
         try {
@@ -316,7 +316,7 @@ public class APIAppointmentRequestController extends APIController {
      * @return The page to display for the user
      */
     @GetMapping ( BASE_PATH + "/viewAppointments" )
-    @PreAuthorize ( "hasAnyRole('ROLE_HCP', 'ROLE_VACCINATOR')" )
+    @PreAuthorize ( "hasAnyRole('ROLE_HCP')" + "|| hasAnyRole('ROLE_VACCINATOR')" )
     public List<AppointmentRequest> upcomingAppointments () {
         final User hcp = userService.findByName( LoggerUtil.currentUser() );
 
