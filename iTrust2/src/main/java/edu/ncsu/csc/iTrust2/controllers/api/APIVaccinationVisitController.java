@@ -187,10 +187,15 @@ public class APIVaccinationVisitController extends APIController {
                         && stat == PatientVaccinationStatus.PARTIALLY_VACCINATED ) {
                     stat = PatientVaccinationStatus.FULLY_VACCINATED;
                 }
+                if ( visitForm.getType().getDoseNumber() == 2 && stat == PatientVaccinationStatus.NO_VACCINATION ) {
+                    stat = PatientVaccinationStatus.PARTIALLY_VACCINATED;
+                }
                 // Vaccine is one dose, patient is now fully vaccinated
                 if ( visitForm.getType().getDoseNumber() == 1 && stat == PatientVaccinationStatus.NO_VACCINATION ) {
                     stat = PatientVaccinationStatus.FULLY_VACCINATED;
                 }
+                p.setVaccinationStatus( stat );
+                userService.save( p );
 
             }
 
