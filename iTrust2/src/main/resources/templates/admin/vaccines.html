@@ -23,14 +23,17 @@
     		if (vaccine.name.length > 20) {
     			err.push("Name exceeds the character limit of 20");
     		}
-    		if (vaccine.ageMin < 12) {
-    			err.push("Age is below minimum of 12");
+    		if (vaccine.ageMin < 0 || vaccine.ageMax < 0 ) {
+    			err.push("Age is below minimum of 0");
     		}
     		if (vaccine.ageMax > 120) {
     			err.push("Age is above maximum of 120");
     		}
-    		if (vaccine.doseNumber < 1) {
-    			err.push("Number of Doses must be above 0");
+    		if (vaccine.doseNumber != 1 && vaccine.doseNumber != 2) {
+    			err.push("Number of Doses must be either 1 or 2");
+    		}
+    		if (vaccine.doseNumber == 1 && vaccine.daysBetween != 0) {
+    			err.push("One dose vaccines cannot have days between doses")
     		}
     		if (vaccine.daysBetween < 0) {
     			err.push("Days Between doses must be positive");
