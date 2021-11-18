@@ -78,6 +78,7 @@
                             $scope.twelveAndUp = true;
                         }
                         
+                        //STORES PATIENT VACCINATION STATUS
                         $scope.visit.status = $scope.visit.patient.vaccinationStatus;
                  
                     }
@@ -94,6 +95,8 @@
     					.then(function (response) {
     						$scope.vaccines = response.data;
     						$scope.selectedVaccine = response.data[0];
+                        	$scope.dosesNum = $scope.selectedVaccine.doseNumber;
+
     					});
     				/**
     				 * Loads the Appointment Requests from the API.
@@ -113,6 +116,8 @@
                     
                     /* Gets number of doses in selected vaccine */
                     $scope.doses = function() {
+                    	//Doses in the vaccine, helps determine if follow up appointment should be should
+                    	//only called when a vaccine is chosen
                     	$scope.dosesNum = $scope.selectedVaccine.doseNumber;
                     }
                     
@@ -122,8 +127,11 @@
                     $scope.submit = function () {
                         $scope.errorMsg = "";
                         $scope.message = "";
+                        //Goten from office visit version
                         $scope.visit.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null; /* Ugly hack; use this to retrieve the name of the HCP who is currently logged in.  This grabs it from Thymeleaf */
-						$scope.visit.type = $scope.selectedVaccine;
+						//stores type of vaccine
+                        $scope.visit.type = $scope.selectedVaccine;
+                        
 
                         // Validate date and time
                         var date = new Date($scope.visitInputDate);
@@ -146,7 +154,7 @@
                             $scope.visit.date = date.toISOString();
                         }
                         
-                        
+                        //Check hospital was selected
                         if ($scope.visit.hospital == null) {
                         	$scope.errorMsg += "Vaccination Visit must have a hospital \n";
                         }
@@ -163,7 +171,7 @@
 	                        if ($scope.followUpDate != null && $scope.followUpTime != null) {
 	                        
 	                        	var fdate = new Date($scope.followUpDate);
-	                        	
+	                        	//Checks followup date
 		                        if (!dateTimeService.isValidDate($scope.followUpDate)) {
 		                            $scope.errorMsg += "Please input a valid follow up date\n";
 		                        }
@@ -204,7 +212,9 @@
                         
                        if ($scope.errorMsg == "") {
 
-                               
+                               if($scope.dosesNum != 2 || !$scope.followupselected){
+                            	   delete $scope.visit['fdate'];
+                               }
                        		$http({
                                  method: 'POST',
                                  url: '/iTrust2/api/v1/vaccinationvisits',
@@ -217,6 +227,8 @@
                                  $scope.errorMsg = "Error occurred creating vaccination visit: " + rejection.data.message;
                              })
                           
+                             $scope.visit = null;
+                             
                         } else {
                             $scope.message = "";
                         }
@@ -250,8 +262,8 @@
 
 									<div class="form-group col-md-2 text-right">
 										<div class="checkbox">
-											<label> <input type="checkbox" name="preScheduled"
-												class="checkbox" ng-model="visit.prescheduled">Prescheduled?
+											<label> <input type="checkbox" name="unScheduled"
+												class="checkbox" ng-model="visit.unscheduled">Unscheduled?
 											</label>
 										</div>
 									</div>
@@ -317,7 +329,7 @@
 											</div>
 										</div>
 									</div>
-								
+								<div ng-show="!visit.unscheduled">
 									<div class="form-group col-md-4">
 										<label>Associated Appointment Request:</label>
 
@@ -339,9 +351,13 @@
 										</div>
 									</div>
 								</div>
-								
-								<div ng-show="dosesNum == 2 && status != 2" class="form-group">
-								    <label>Follow-Up Appointment:</label>
+								</div>
+								<div ng-show="dosesNum == 2 && visit.status != 1" class="form-group">
+									<label>Followup? </label><input type="checkbox" name="followupselected"
+												class="checkbox" ng-model="followupselected">
+											
+									<div ng-show="followupselected" class="form-group">
+							
 									<div class="row">
 													
 										
@@ -356,6 +372,7 @@
 												name="time" class="form-control" ng-model="followUpTime"
 												 />
 										</div>
+									</div>
 									</div>
 								</div>
 									
