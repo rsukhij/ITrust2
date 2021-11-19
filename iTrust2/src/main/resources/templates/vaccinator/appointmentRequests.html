@@ -27,9 +27,9 @@
 
 			app.controller('viewAppointmentRequestHCPCtrl', function ($scope, $http) {
 				$scope.selectedAppointment = {};
-				$scope.appointments = [];
+				//$scope.appointments = [];
 				$scope.hcp = /*[[${#httpServletRequest.remoteUser}]]*/null;
-				$scope.loadAppointments = function () {
+				/*$scope.loadAppointments = function () {
 					$http.get("/iTrust2/api/v1/appointmentrequestForHCP")
 						.then(function (response) {
 							$scope.appointments = response.data;
@@ -37,7 +37,7 @@
 								$scope.errorMsg = "No appointment requests found."
 							}
 						});
-				}
+				} */
 
 				$http.get("/iTrust2/api/v1/appointmentstatus")
 					.then(function (response) {
@@ -61,6 +61,7 @@
 				}
 
 				$scope.appointmentByID = {};
+				/*
 				$scope.updateAppointment = function () {
 					$scope.errorMsg = "";
 					if ($scope.selectedAppointment.status == null) {
@@ -93,8 +94,9 @@
 							});
 					}
 				}
+				*/
 
-				$scope.loadAppointments();
+				//$scope.loadAppointments();
 				$scope.loadIncomingAppointments();
 			});
 			/*]]>*/
@@ -105,7 +107,7 @@
 			<table style="width: 100%">
 				<tr>
 					<td style="vertical-align: top">
-						<h3>Upcoming Medical Appointment</h3>
+						<h3>Upcoming Medical Appointments</h3>
 						<ul style="list-style: none;">
 							<li ng-repeat="appt in incomingAppointments"><label>
 									Type: {{appt.type | humanize}} <br /> Date: {{appt.date | date
@@ -115,8 +117,7 @@
 						</ul>
 						<div name="errorMsg1" class="text-danger">{{errorMsg1}}</div>
 					</td>
-
-					<td style="width: 40%; vertical-align: top">
+					<!-- <td style="width: 40%; vertical-align: top">
 						<h3>Update Medical Appointment Requests</h3>
 						<div class="col radio-box">
 							<div class="form-check">
@@ -148,7 +149,8 @@
 							<div name="success" class="text-success">{{message}}</div>
 							<div name="errorMsg" class="text-danger">{{errorMsg}}</div>
 						</div>
-					</td>
+					</td> -->
+					
 				</tr>
 			</table>
 		</div>
