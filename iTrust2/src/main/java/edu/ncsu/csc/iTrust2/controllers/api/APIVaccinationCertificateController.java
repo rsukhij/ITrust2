@@ -3,6 +3,7 @@ package edu.ncsu.csc.iTrust2.controllers.api;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,22 +83,20 @@ public class APIVaccinationCertificateController extends APIController {
             final boolean vaccinated = false;
             int visitnum = 1;
             for ( final VaccinationVisit visit : visits ) {
-                certificate.add( new Paragraph( "COVID-19 Vaccine: " + visit.getVaccines().getName() ) );
-                certificate.add( new Paragraph( "Date: " + visit.getDate().getMonth().getValue() + "/"
-                        + visit.getDate().getDayOfMonth() + "/" + visit.getDate().getYear() ) );
+                certificate.add( new Paragraph( "\nCOVID-19 Vaccine: " + visit.getVaccines().getName() ) );
+                final DateTimeFormatter formatter = DateTimeFormatter.ofPattern( "MM/dd/yyyy 'at' HH:mm:ss z" );
 
-                certificate.add(
-                        new Paragraph( "Time: " + visit.getDate().getHour() + ":" + visit.getDate().getMinute() ) );
-                certificate.add( new Paragraph( "Staff Member: " + visit.getVaccinator().getUsername() ) );
+                final String formattedDateTime = visit.getDate().format( formatter );
+                certificate.add( new Paragraph( "Given on " + formattedDateTime ) );
 
                 certificate.add( new Paragraph( "Dose: " + visitnum + " of " + visit.getVaccines().getDoseNumber() ) );
                 visitnum++;
             }
             if ( self.getVaccinationStatus() != null ) {
-                certificate.add( new Paragraph( "Vaccination Status: " + self.getVaccinationStatus().toString() ) );
+                certificate.add( new Paragraph( "\nVaccination Status: " + self.getVaccinationStatus().toString() ) );
             }
             else {
-                certificate.add( new Paragraph( "Vaccination Status: " + "NO VACCINATION" ) );
+                certificate.add( new Paragraph( "\nVaccination Status: " + "NO VACCINATION" ) );
             }
 
             certificate.close();
