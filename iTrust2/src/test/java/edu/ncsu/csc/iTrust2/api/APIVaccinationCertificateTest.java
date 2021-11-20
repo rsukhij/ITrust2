@@ -64,7 +64,6 @@ public class APIVaccinationCertificateTest {
      *
      * @return the success/failure message as to whether a pdf is created
      */
-    // @SuppressWarnings ( { "rawtypes", "unchecked" } )
 
     // @PreAuthorize ( "hasAnyRole('ROLE_PATIENT')" )
     // @Test
@@ -76,7 +75,7 @@ public class APIVaccinationCertificateTest {
     // status().isOk() )
     // .andExpect( content().contentType( MediaType.APPLICATION_JSON_VALUE ) );
     //
-    // // .downloadCertificate();
+    // downloadCertificate();
     //
     // }
     //
